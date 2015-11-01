@@ -1,7 +1,7 @@
 #include "camaralenta.h"
 
-CamaraLenta::CamaraLenta(const Pelicula &peli, int c0)
-: peli(peli), c0(c0), h(peli.size()), w(peli.size())
+CamaraLenta::CamaraLenta(Pelicula peli, int c0, int f)
+: peli(peli), c0(c0), h(peli.size()), w(peli[0].size()), f(f)
 {
 }
 
@@ -9,7 +9,7 @@ Pelicula CamaraLenta::alentar(int dc) const
 {
 	Pelicula r(h, std::vector <PixelTiempo> (w));
 
-	int c1 = c0 * dc;
+	int c1 = c0 * (dc + 1);
 	for (int i = 0; i < h; i++)
 	{
 		for (int j = 0; j < w; j++)

@@ -6,7 +6,6 @@
 class VecinoMasCercano : public CamaraLenta
 {
 	using CamaraLenta::CamaraLenta;
-
 	PixelTiempo alentarPixel(const PixelTiempo&, int, int) const;
 };
 

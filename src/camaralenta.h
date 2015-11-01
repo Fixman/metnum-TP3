@@ -20,7 +20,9 @@ class CamaraLenta
 	const int h, w;
 
 	public:
-	CamaraLenta(const Pelicula&, int);
+	const int f;
+
+	CamaraLenta(Pelicula, int, int);
 	Pelicula alentar(int) const;
 };
 
