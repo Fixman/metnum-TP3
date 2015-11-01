@@ -1,0 +1,35 @@
+En esta secci\'on realizaremos una breve descripci\'on te\'orica acerca de los temas a tratar en este trabajo, con la finalidad de tener una idea clara de los mismos para poder tener un mejor entendimiento de lo realizado.
+
+\subsection{¿Qu\'e es un video digital?}
+
+Un video est\'a compuesto por cuadros (denominados tambi\'en frames en ingl\'es) donde cada uno de ellos es una imagen. El ojo humano es capaz de distinguir aproximadamente 20 im\'agenes por segundo. De este modo, cuando se muestran m\'as de 20 imágenes por segundo, es posible enga\~nar al ojo y crear la ilusi\'on de una imagen en movimiento. La fluidez de un video se caracteriza por el número de im\'agenes por segundo (frecuencia de cuadros), expresado en \textbf{FPS} (cuadros por segundo). 
+
+\subsection{Videos en c\'amara lenta}
+
+La c\'amara lenta es un efecto visual que permite retrasar artificialmente una acci\'on con el fin de aumentar el impacto visual o emocional. La c\'amara lenta se obtiene rodando una escena con un n\'umero de im\'agenes por segundo superior a la velocidad de proyecci\'on. Al pasar el registro con un n\'umero de im\'agenes por segundo normal, la escena, m\'as larga, da la impresión de desarrollarse lentamente. Por lo general las tomas de c\'amara lenta se generan con c\'amaras que permiten tomar alt\'isimos nu\'meros de cuadros por segundo, unos 100 o m\'as en comparaci\'on con entre 24 y 30 que se utilizan normalmente.
+
+Nuestro trabajo se centrar\'a en este tipo de videos. Utilizando diferentes t\'ecnicas, crearemos cuadros artificiales a partir de los originales para generar el efecto de la c\'amara a partir de videos que no son de c\'amara lenta. Utilizaremos im\'agenes  en escala de grises para disminuir los costos en tiempo necesarios para procesar los datos y simplificar la implementaci\'on; sin embargo, la misma idea puede ser utilizada para videos en color.
+
+\subsection{M\'etodos de generaci\'on de cuadros}
+
+Para la generaci\'on de cuadros extra construiremos, para cada posici\'on (i,j), los valores de los cuadros agregados en funci\'on de los cuadros conocidos. Lo que haremos ser\'a interpolar en el tiempo y para ello consideraremos los siguientes tres m\'etodos de interpolaci\'on:
+
+\begin{enumerate}
+\item \textbf{Vecino m\'as cercano:} Consiste en rellenar el nuevo cuadro replicando los valores de los p\'ixeles del cuadro original que se encuentra m\'as cerca.
+\item \textbf{Interpolaci\'on lineal:} Consiste en rellenar los p\'ixeles utilizando interpolaciones lineales entre p\'ixeles de cuadros originales consecutivos.
+\item \textbf{Interpolaci\'on por Splines:} Similar al anterior, pero considerando interpolar utilizando splines y tomando una cantidad de cuadros mayor.
+\end{enumerate}
+
+Durante el desarrollo del trabajo, analizaremos las caracter\'isticas, ventajas y desventajas particulares de cada uno de los m\'etodos. 
+
+\subsection{Conceptos relevantes para el desarrollo}
+
+Para realizar un an\'alisis cuantitativo, llamaremos F al frame del video real (ideal) que deber\'iamos obtener con nuestro algoritmo, y $\overline{F}$ al frame del video efectivamente construido. Consideramos entonces dos medidas, directamente relacionadas entre ellas, como el \textbf{Error Cuadr\'atico Medio} (ECM) y \textbf{Peak to Signal Noise Ratio} (PSNR), denotados por ECM(F, $\overline{F}$) y PSNR(F, $\overline{F}$), respectivamente, y definidos como:
+
+$ECM(F, \overline{F}) = \frac{1}{mn} \sum\limits_{i=1}^m\sum\limits_{j=1}^n |F_{k_{ij}} - \overline{F}_{k_{ij}}|^2$ (1)
+
+y
+
+$PSNR(F, \overline{F}) = 10log_{10}(\frac{255^2}{ECM(F,\overline{F})})$
+
+Donde $m$ es la cantidad de filas de p\'ixeles en cada imagen y $n$ es la cantidad de columnas.
