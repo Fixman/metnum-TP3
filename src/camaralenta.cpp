@@ -9,7 +9,7 @@ Pelicula CamaraLenta::alentar(int dc) const
 {
 	Pelicula r(h, std::vector <PixelTiempo> (w));
 
-	int c1 = c0 * (dc + 1);
+	int c1 = (c0 - 1) * (dc + 1) + 1;
 	for (int i = 0; i < h; i++)
 	{
 		for (int j = 0; j < w; j++)
