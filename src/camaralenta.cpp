@@ -12,7 +12,7 @@ CamaraLenta::Pelicula CamaraLenta::alentar(int c1) const
 	for (int i = 0; i < h; i++)
 	{
 		for (int j = 0; j < w; j++)
-			r[i][j] = alentarPixel(peli[i][j]);
+			r[i][j] = alentarPixel(peli[i][j], c0, c1);
 	}
 
 	return r;
