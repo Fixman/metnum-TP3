@@ -5,7 +5,7 @@ CamaraLenta::CamaraLenta(const Pelicula &peli, int c0)
 {
 }
 
-CamaraLenta::Pelicula CamaraLenta::alentar(int c1) const
+Pelicula CamaraLenta::alentar(int c1) const
 {
 	Pelicula r(h, std::vector <PixelTiempo> (w));
 
