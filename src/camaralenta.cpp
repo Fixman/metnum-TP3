@@ -5,10 +5,11 @@ CamaraLenta::CamaraLenta(const Pelicula &peli, int c0)
 {
 }
 
-Pelicula CamaraLenta::alentar(int c1) const
+Pelicula CamaraLenta::alentar(int dc) const
 {
 	Pelicula r(h, std::vector <PixelTiempo> (w));
 
+	int c1 = c0 * dc;
 	for (int i = 0; i < h; i++)
 	{
 		for (int j = 0; j < w; j++)
