@@ -52,9 +52,9 @@ sys.argv = ['tools/videoToTextfile.py', 'data/funnybaby.avi', 'temp.txt', '1']
 execfile('tools/videoToTextfile.py')
 
 f = open("temp.txt","r")
-qFrames = f.readline()
-height,width = f.readline().split(",")
-frameRate = f.readline()
+qFrames = float(f.readline())
+height,width = map(float, f.readline().split(","))
+frameRate = float(f.readline())
 
 frames = []
 
@@ -69,6 +69,15 @@ cuttedVideo = quitarFramesPares(frames)
 cuttedFrames = qFrames / 2
 originalFramesCutted = getFramesIdeales(frames)
 
+tf = open('cuttedVideo.txt', 'w+')
+tf.write(str(cuttedFrames)+"\n")
+tf.write(str(height)+","+str(width)+"\n")
+tf.write(str(frameRate)+"\n")
 
+for frame in cuttedVideo:
+	tf.write(",".join(str(pixel) for pixel in frame)+"\n")
+
+# os.system('./tp temp.txt out.txt 0 1')
+process = subprocess.call('./tp cuttedVideo.txt out.txt 1 1', shell=True)
 
 os.remove("temp.txt")
