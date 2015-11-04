@@ -5,8 +5,11 @@
 
 class Splines : public CamaraLenta
 {
-	using CamaraLenta::CamaraLenta;
+	int reset;
 	PixelTiempo alentarPixel(const PixelTiempo&, int, int) const;
+
+	public:
+	Splines(Pelicula peli, int c0, int f, int reset = 4);
 };
 
 #endif
