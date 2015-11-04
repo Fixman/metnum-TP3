@@ -7,6 +7,7 @@
 #include "camaralenta.h"
 #include "vecinomascercano.h"
 #include "interpolacionlineal.h"
+#include "splines.h"
 
 enum class Metodo
 {
@@ -49,6 +50,9 @@ CamaraLenta *parsearEntrada(FILE *in, Metodo m)
 
 		case Metodo::interpolacionLineal:
 			return new InterpolacionLineal(p, c, f);
+
+		case Metodo::interpolacionPorSplines:
+			return new Splines(p, c, f);
 	}
 
 	std::cerr << "Metodo invalido! Esto no deberia pasar." << std::endl;
