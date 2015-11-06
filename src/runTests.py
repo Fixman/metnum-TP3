@@ -2,6 +2,7 @@ import sys
 import os
 import subprocess
 import math
+import shutil
 
 #########################
 # Funciones Auxiliares  #
@@ -18,18 +19,15 @@ def ECM(qPixels, frameIdeal, frameGenerado, width, height):
 			suma += pow((frameIdeal[i,j] - frameGenerado[i,j]), 2) 
 	return suma / qPixels
 
-def quitarFramesPares(frames):
-	newFrames = []
-	for frame in frames:
-		newFrames.append(frame[::2])
-	return newFrames
-
 # Los frames ideales seran los que se quitaron del video
 # original con la funcion quitarFramesPares
 def getFramesIdeales(frames):
 	idealFrames = []
+	n = 0;
 	for frame in frames:
-		idealFrames.append(frame[1::2])
+		if (n % 2) == 1:
+			idealFrames.append(frame)
+		n = n + 1
 	return idealFrames
 
 #########################
@@ -48,36 +46,38 @@ else:
 # Genera archivo temporal. #
 ############################
 
-sys.argv = ['tools/videoToTextfile.py', 'data/funnybaby.avi', 'temp.txt', '1']
+sys.argv = ['tools/videoToTextfile.py', 'data/funnybaby.avi', 'originalVideo.txt', '1']
 execfile('tools/videoToTextfile.py')
 
-f = open("temp.txt","r")
+f = open("originalVideo.txt","r")
 qFrames = float(f.readline())
 height,width = map(float, f.readline().split(","))
 frameRate = float(f.readline())
-
-frames = []
-
-for line in f:
-	frames.append(map(int, line.split(",")))
 
 ####################
 # Prepara frames.  #
 ####################
 
-cuttedVideo = quitarFramesPares(frames)
-cuttedFrames = qFrames / 2
-originalFramesCutted = getFramesIdeales(frames)
+frames = []
 
-tf = open('cuttedVideo.txt', 'w+')
-tf.write(str(cuttedFrames)+"\n")
-tf.write(str(height)+","+str(width)+"\n")
-tf.write(str(frameRate)+"\n")
+n = 1
+pixels = []
+for line in f:
+	pixels.append(map(int, line.split(",")))
+	if (n % height) == 0:
+		frames.append(pixels)
+		pixels = []
+	n = n + 1
 
-for frame in cuttedVideo:
-	tf.write(",".join(str(pixel) for pixel in frame)+"\n")
+idealFrames = getFramesIdeales(frames)
+
+sys.argv = ['tools/videoToTextfile.py', 'data/funnybaby.avi', 'cuttedVideo.txt', '2']
+execfile('tools/videoToTextfile.py')
+
+# os.remove("cuttedVideoTemp.txt")
 
 # os.system('./tp temp.txt out.txt 0 1')
-process = subprocess.call('./tp cuttedVideo.txt out.txt 1 1', shell=True)
+# process = subprocess.Popen('./tp cuttedVideo.txt out.txt 1 1', shell=True)
+# process.wait()
 
-os.remove("temp.txt")
+# os.remove("cuttedVideo.txt")
