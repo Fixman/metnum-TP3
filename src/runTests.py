@@ -34,7 +34,7 @@ def getFramesIdeales(frames):
 # Parametros de entrada.#
 #########################
 
-if len(sys.argv) >= 4:
+if len(sys.argv) >= 4	:
     inputFile = sys.argv[1]
     outputFile = sys.argv[2]
     method = int(sys.argv[3])
@@ -46,7 +46,7 @@ else:
 # Genera archivo temporal. #
 ############################
 
-sys.argv = ['tools/videoToTextfile.py', 'data/funnybaby.avi', 'originalVideo.txt', '1']
+sys.argv = ['tools/videoToTextfile.py', inputFile, 'originalVideo.txt', '1']
 execfile('tools/videoToTextfile.py')
 
 f = open("originalVideo.txt","r")
@@ -71,12 +71,13 @@ for line in f:
 
 idealFrames = getFramesIdeales(frames)
 
-sys.argv = ['tools/videoToTextfile.py', 'data/funnybaby.avi', 'cuttedVideo.txt', '2']
+sys.argv = ['tools/videoToTextfile.py', inputFile, outputFile, method]
 execfile('tools/videoToTextfile.py')
+
+f2 = open("prueba.txt","W+")
 
 # os.remove("cuttedVideoTemp.txt")
 
-# os.system('./tp temp.txt out.txt 0 1')
 # process = subprocess.Popen('./tp cuttedVideo.txt out.txt 1 1', shell=True)
 # process.wait()
 
