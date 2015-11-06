@@ -39,7 +39,11 @@ CamaraLenta *parsearEntrada(FILE *in, Metodo m)
 		for (int i = 0; i < h; i++)
 		{
 			for (int u = 0; u < w; u++)
-				std::fscanf(in, "%d,", &p[i][u][t]);
+			{
+				int g;
+				std::fscanf(in, "%d,", &g);
+				p[i][u][t] = g;
+			}
 		}
 	}
 
