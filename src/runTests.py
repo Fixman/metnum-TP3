@@ -12,20 +12,20 @@ def PSNR(ecm):
 	psnr = 10 * math.log(pow(255, 2) / ecm, 10)
 	return psnr
 
-def ECM(qPixels, frameIdeal, frameGenerado, width, height):
+def ECM(frameIdeal, frameGenerado, width, height):
 	suma = 0;
 	for i in xrange(0, height):
 		for j in xrange(0, width):
 			suma += pow((frameIdeal[i,j] - frameGenerado[i,j]), 2) 
-	return suma / qPixels
+	return suma / (height * width)
 
 # Los frames ideales seran los que se quitaron del video
 # original con la funcion quitarFramesPares
-def getFramesIdeales(frames):
+def getFramesIdeales(frames, jump):
 	idealFrames = []
 	n = 0;
 	for frame in frames:
-		if (n % 2) == 1:
+		if (n % jump) > 0:
 			idealFrames.append(frame)
 		n = n + 1
 	return idealFrames
@@ -34,10 +34,11 @@ def getFramesIdeales(frames):
 # Parametros de entrada.#
 #########################
 
-if len(sys.argv) >= 4	:
+if len(sys.argv) >= 5:
     inputFile = sys.argv[1]
     outputFile = sys.argv[2]
-    method = int(sys.argv[3])
+    jump = int(sys.argv[3])
+    method = int(sys.argv[4])
 else:
 	print 'Parametros incorrectos'
 	sys.exit()
@@ -69,16 +70,58 @@ for line in f:
 		pixels = []
 	n = n + 1
 
-idealFrames = getFramesIdeales(frames)
+idealFrames = getFramesIdeales(frames, jump)
 
-sys.argv = ['tools/videoToTextfile.py', inputFile, outputFile, method]
+####################################
+# Quita frames de video original.  #
+####################################
+
+sys.argv = ['tools/videoToTextfile.py', inputFile, outputFile, jump]
 execfile('tools/videoToTextfile.py')
 
-f2 = open("prueba.txt","W+")
+####################################
+# Regenera los frames con metodo.  #
+####################################
 
-# os.remove("cuttedVideoTemp.txt")
+process = subprocess.Popen('./tp '+outputFile+' out.txt '+str(method)+' '+str(jump-1), shell=True)
+process.wait()
 
-# process = subprocess.Popen('./tp cuttedVideo.txt out.txt 1 1', shell=True)
-# process.wait()
+f2 = open("out.txt","r")
+qFrames = float(f2.readline())
+height,width = map(float, f2.readline().split(","))
+frameRate = float(f2.readline())
 
-# os.remove("cuttedVideo.txt")
+####################
+# Prepara frames.  #
+####################
+
+frames2 = []
+
+m = 1
+pixels2 = []
+for line in f2:
+	pixels2.append(map(int, line.split(",")))
+	if (m % height) == 0:
+		frames2.append(pixels2)
+		pixels2 = []
+	m = m + 1
+
+generatedFrames = getFramesIdeales(frames2, jump)
+
+print frames[0]
+print frames2[0]
+
+####################################
+# Convierte a video el generado.   #
+####################################
+
+sys.argv = ['tools/textfileToVideo.py', 'out.txt', "out.avi"]
+execfile('tools/textfileToVideo.py')
+
+################################
+# Remueve archivos generados.  #
+################################
+
+os.remove(outputFile)
+os.remove("originalVideo.txt")
+os.remove("out.txt")
