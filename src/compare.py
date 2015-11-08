@@ -2,7 +2,7 @@ import sys
 import os
 import subprocess
 import math
-import shutil
+import time
 
 #########################
 # Funciones Auxiliares  #
@@ -84,8 +84,12 @@ execfile('tools/videoToTextfile.py')
 # Regenera los frames con metodo.  #
 ####################################
 
+start_time = time.time()
 process = subprocess.Popen('./tp '+outputFile+' out.txt '+str(method)+' '+str(jump-1), shell=True)
 process.wait()
+elapsed_time = time.time() - start_time
+
+print "\nTiempo total algoritmo: "+str(elapsed_time)+"\n"
 
 f2 = open("out.txt","r")
 qFrames = int(f2.readline())
@@ -109,11 +113,17 @@ for line in f2:
 
 generatedFrames = getFramesIdeales(frames2, jump)
 
-ecm = ECM(idealFrames[0], generatedFrames[0], height, width)
-psnr = PSNR(ecm)
+qFramesCompared = len(generatedFrames)
+totalEcm = 0
 
-print "\nECM: " + str(ecm) + "\n"
-print "PSNR: " + str(psnr) + "\n"
+for k in xrange(0, qFramesCompared-1):
+	totalEcm = totalEcm + ECM(idealFrames[k], generatedFrames[k], height, width)
+
+promECM = totalEcm / qFramesCompared
+promPSNR = PSNR(promECM)
+
+print "\nECM: " + str(promECM) + "\n"
+print "PSNR: " + str(promPSNR) + "\n"
 
 ####################################
 # Convierte a video el generado.   #
