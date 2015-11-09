@@ -18,11 +18,11 @@ enum class Metodo
 
 void usage(char *name)
 {
-	std::cout << "Usage: " << name << " entrada salida metodo cuadros_a_agregar" << std::endl;
+	std::cout << "Usage: " << name << " entrada salida metodo cuadros_a_agregar [reset]" << std::endl;
 	exit(1);
 }
 
-CamaraLenta *parsearEntrada(FILE *in, Metodo m)
+CamaraLenta *parsearEntrada(FILE *in, Metodo m, int reset)
 {
 	int c;
 	fscanf(in, "%d\n", &c);
@@ -47,6 +47,9 @@ CamaraLenta *parsearEntrada(FILE *in, Metodo m)
 		}
 	}
 
+	if (reset == -1)
+		reset = c;
+
 	switch (m)
 	{
 		case Metodo::vecinoMasCercano:
@@ -56,7 +59,7 @@ CamaraLenta *parsearEntrada(FILE *in, Metodo m)
 			return new InterpolacionLineal(p, c, f);
 
 		case Metodo::interpolacionPorSplines:
-			return new Splines(p, c, f);
+			return new Splines(p, c, f, reset);
 	}
 
 	std::cerr << "Metodo invalido! Esto no deberia pasar." << std::endl;
@@ -86,7 +89,7 @@ void escribirSalida(FILE *out, const Pelicula &p, int f)
 
 int main(int argc, char *argv[])
 {
-	if (argc != 5)
+	if (argc < 5 || argc > 6)
 		usage(argv[0]);
 	
 	char *entrada = argv[1];
@@ -95,13 +98,17 @@ int main(int argc, char *argv[])
 	Metodo m = Metodo(atoi(argv[3]));
 	int dc = atoi(argv[4]);
 
+	int reset = -1;
+	if (argc == 6)
+		reset = atoi(argv[5]);
+
 	FILE *in = fopen(entrada, "r");
 	FILE *out = fopen(salida, "w");
 
 	if (int(m) <= 0 || int(m) > 3 || dc < 0 || in == NULL)
 		usage(argv[0]);
 
-	CamaraLenta *q = parsearEntrada(in, m);
+	CamaraLenta *q = parsearEntrada(in, m, reset);
 	Pelicula r = q->alentar(dc);
 
 	escribirSalida(out, r, q->f);
