@@ -84,12 +84,18 @@ execfile('tools/videoToTextfile.py')
 # Regenera los frames con metodo.  #
 ####################################
 
-start_time = time.time()
-process = subprocess.Popen('./tp '+outputFile+' out.txt '+str(method)+' '+str(jump-1), shell=True)
-process.wait()
-elapsed_time = time.time() - start_time
+times = 10
+prom_elapsed_time = 0
 
-print "\nTiempo total algoritmo: "+str(elapsed_time)+"\n"
+for t in xrange(1, times):
+	start_time = time.time()
+	process = subprocess.Popen('./tp '+outputFile+' out.txt '+str(method)+' '+str(jump-1), shell=True)
+	process.wait()
+	prom_elapsed_time = prom_elapsed_time + (time.time() - start_time)
+
+prom_elapsed_time = prom_elapsed_time / 10
+
+print "\nTiempo promedio 10 corridas algoritmo: "+str(prom_elapsed_time)+"\n"
 
 f2 = open("out.txt","r")
 qFrames = int(f2.readline())
