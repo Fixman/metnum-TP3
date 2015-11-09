@@ -70,15 +70,29 @@ std::vector <Splines::Polynomial> Splines::buildSpline(const Vector &y, double q
 PixelTiempo Splines::alentarPixel(const PixelTiempo &P, int c0, int c1) const
 {
 	int q = (c1 - 1) / (c0 - 1);
-	std::vector <Polynomial> z = buildSpline(Vector(P.begin(), P.end()), q);
 
 	PixelTiempo r(c1);
-	for (int i = 0; i < c0 - 1; i++)
+
+	bool finish = false;
+	for (int f = 0; f <= (c0 - 1) / reset && !finish; f++)
 	{
-		for (int j = 0; j < q; j++)
+		int first = f * reset;
+		int last = std::min(reset * (f + 1), (int) P.size() - 1);
+
+		if (std::min(reset * (f + 2), (int) P.size() - 1) - last < 2)
 		{
-			double x = (i * q) + j;
-			r[x] = toPixel(z[i].a + z[i].b * j + z[i].c * std::pow(j, 2) + z[i].d * std::pow(j, 3));
+			last = P.size() - 1;
+			finish = true;
+		}
+
+		std::vector <Polynomial> z = buildSpline(Vector(P.begin() + (f * reset), P.begin() + last), q);
+		for (int i = 0; i < last - (f * reset); i++)
+		{
+			for (int j = 0; j < q; j++)
+			{
+				double x = ((f * reset + i) * q) + j;
+				r[x] = toPixel(z[i].a + z[i].b * j + z[i].c * std::pow(j, 2) + z[i].d * std::pow(j, 3));
+			}
 		}
 	}
 	r[c1 - 1] = P[c0 - 1];
