@@ -5,8 +5,14 @@
 
 class Splines : public CamaraLenta
 {
-	int reset;
+	struct Polynomial
+	{
+		double a, b, c, d;
+	};
+
 	PixelTiempo alentarPixel(const PixelTiempo&, int, int) const;
+
+	int reset;
 
 	public:
 	Splines(Pelicula peli, int c0, int f, int reset = 4);
