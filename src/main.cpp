@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 		duration += std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
 	}
 	
-	cout << endl << argv[4] << " " << duration / 10;
+	cout << endl << argv[4] << ", " << duration / 10;
 	
 
 	escribirSalida(out, r, q->f);
