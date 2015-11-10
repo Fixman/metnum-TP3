@@ -1,1 +1,287 @@
-En esta secci\'on explicaremos en detalle la estrategia que utilizamos para la implementaci\'on de los algoritmos para crear los frames o cuadros extra de manera de crear el efecto de c\'amara lenta deseado.
+\section{Desarrollo}
+
+\subsection{Consideraciones Generales}
+
+Cada video est\'a compuesto por frames de $h$ pixeles de altura y $w$ pixeles de
+ancho, donde cada pixel es un valor entero del $0$ al $255$, inclusive. A la
+vez, se consideran $c0$ de estos frames en suceci\'on para formar el video.
+
+Para alentar el video nosotros tomamos un factor $q > 1$ (equivalente al
+argumento $c + 1$), y generamos un video con $c1 = (c0 - 1) * q + 1$ frames. A cada frame
+le aplicamos cierto \textit{m\'etodo}, dependiendo de nuestras restricciones,
+para aproximar los frames restantes entre el video original y el video alentado.
+
+Cada uno de los m\'etodos que usamos opera con un solo pixel y el cambio de su
+valor a trav\'es del tiempo, as\'i que no es necesario que conozca todo un frame
+entero. Por esto, definimos cada m\'etodo como una funci\'on que toma dos
+par\'ametro:
+
+\[
+\begin{split}
+P \in \mathbb{P}^{c_0} & : \text{un vector de pixeles (valores en $[0, 255]$)} \\
+c1 \in \mathbb{N} & : \text{la cantidad de frames en la pel\'icula resultante}
+\end{split}
+\]
+
+Y a la vez devuelve un par\'ametro del tipo
+
+\[
+A \in \mathbb{P}^{c_1} : \text{el pixel $P$ en la pel\'icula final}
+\]
+
+El enunciado tambi\'en especifica el par\'emtro $f$, el framerate del video,
+pero adem\'as de hacerle una transformaci\'on simple al video final no influye a
+ninguno de nuestros m\'etodos.
+
+Durante el resto de la resoluci\'on usamos t\'erminos como ``cercano'' y
+``lejano''. Se debe entender que, como los m\'etodos trabajan sobre un solo
+pixel y como cambia en el tiempo, estos se refieren a t\'erminos t\'emporales y
+no espaciales.
+
+\subsection{Vecino M\'as Cercano}
+
+El m\'etodo del vecino m\'as cercano implica, por cada pixel en la imagen
+resultante, darle el valor del pixel m\'as cercano \footnote{temporalmente} en
+la imagen original. Para lograr esto, podemos definirlo como la siguiente
+sucesi\'on:
+
+\[
+A_i = P_{\left[i / \frac{c_1 - 1}{c_0 - 1}\right]}
+\]
+
+Donde $\left[x\right]$ representa el redondeo de $x$ al entero m\'as cercano.
+
+\subsection{Interpolaci\'on Lineal}
+
+El m\'etodo de la interpolaci\'on lineal consiste en crear una funci\'on lineal
+entre cada par de pixeles consecutivos \footnote{de nuevo, en el sentido
+temporal} de $P$, y estimar los valores del vector $A$ desde el valor que toma
+cada funci\'on en los puntos intermedios.
+
+La funci\'on lineal entre dos puntos $\left(x_0, y_0\right)$ y $\left(x_1,
+y_1\right)$ debe satisfacer la f\'ormula
+
+\[
+\frac{y - y_0}{x - x_0} = \frac{y_1 - y_0}{x_1 - x_0}
+\]
+
+Por lo tanto, podemos definir la funci\'on $f$ que represente la interpolaci\'on
+lineal entre esos dos puntos como
+
+\[
+f(x) = y_0 + (y_1 - y_0) \frac{x - x_0}{x_1 - x_0}
+\]
+
+Como debemos definir esta f\'ormula las interpolaciones entre varios puntos en
+el plano discreto, definimos el m\'etodo como la sucesi\'on
+
+\[
+q = (c1 - 1) / (c0 - 1)
+\]
+
+\[
+\forall{i < c_1}
+\begin{split}
+& x_0_i = \floorl \frac{i}{q} \floorr \\
+& y_0_i = P_{x_0_i} \\
+& x_1_i = \ceill \frac{i}{q} \ceill \\
+& y_1_i = P_{x_1_i} \\
+& A_i = y_0_i + (y_0_i - y_1_i) * \frac{i - x_0_i}{x_1_i - x_0_i}
+\end{split}
+\]
+
+\subsection{Interpolaci\'on por Splines}
+
+En este m\'etodo definimos un spline c\'ubico n\'atural $S$ que interpole todos
+los valores en $P$ para lograr conseguir los valores intermedios de $A$.
+Nosotros definimos este spline como una funci\'on ``flu\'ida'' que pase por
+todos los puntos $(x_0, y_0)$ definidos en $P$. Para lograr esto, separamos $S$
+en diferentes subfunciones, $S_{0 \ldots c_0 - 1}$ tal que cada partici\'on sea
+un polinomio c\'ubico definido entre dos puntos de $P$, y la derivada primera y
+segunda de cada par consecutivos sean iguales. En otras palabras,
+
+\[
+\begin{split}
+S(x) & =
+\begin{cases}
+	S_0(x) & \text{si } x \in [x_0, x_1] \\
+	\vdots \\
+	S_{c_1 - 1} \text{si } x \in [x_{n - 1}, x_n]
+\end{cases} \\
+S_i(x) & = a_i + b_i(x - x_i) + c_i(x - x_i)^2 + d_i(x - x_i)^3 \\
+S_i(x_i + 1) & = S_{x + 1}(x_i + 1) \forall i \in [0, n - 2] \\
+S'_i(x_i + 1) & = S'_{x + 1}(x_i + 1) \forall i \in [0, n - 2] \\
+S''_i(x_i + 1) & = S''_{x + 1}(x_i + 1) \forall i \in [0, n - 2] \\
+S''(x_0) & = S''(x_n) = 0
+\end{split}
+\]
+
+Como en cada $x_i$ $S(x_i) = S_i(x_i)$ y $S_i(x_i) = a_i$, podemos ver que
+
+\[
+a_i = y_i
+\]
+
+Tambi\'en, ya que $S_i(x_i + 1) = y_{i + 1}$,
+
+\[
+a_i + b_i(x_{i + 1} - x_i) + c_i(x_{i + 1} - x_i)^2 + d_i(x_{i + 1} - x_i)^3 = a_{i + 1}
+\]
+
+Derivando cualquier polinomio c\'ubico $S_i$ obtenemos que
+
+\[
+\begin{split}
+S_i'(x) & = b_i + 2 c_i (x - x_i) + 3 d_i (x_(i + 1) - x_i)^2 \\
+S_i''(x) & = 2 c_i + 6 d_i (x - x_i)
+\end{split}
+\]
+
+Por lo tanto, ya que las derivadas primera y segunda de los polinomios
+consecutivos deben ser iguales,
+
+\[
+b_i + 2 c_i (x_{i + 1} - x_i) + 3 d_i (x_{i + 1} - x_i)^2 = b_{i + 1}
+\]
+
+\[
+2 c_i + 6 d_i (x_{i + 1} - x_i) = 2 c_{i + 1}
+\]
+
+Y, como el spline es n\'atural y la derivada segunda en el primer y \'ultimo
+punto debe ser $0$,
+
+\[
+2 c_0 = 0
+\]
+
+\[
+2 c_{n - 1} + 6 d_{n - 1} (x_n - x_{n - 1}) = 0
+\]
+
+Resumiendo, y sabiendo que $x_{i + 1} - x_i = q \forall i \in [0, n - 2]$
+tenemos las siguientes ecuaciones i para los factores de los polinomios:
+
+\begin{enumerate}
+\item $ a_i = y_i $
+\item $ a_i + b_i q + c_i q^2 + d_i q^3 $
+\item $ b_i + 2 c_i q + 3 d_i h_i^2 = b_{i + 1} $
+\item $ 2 c_i + 6 d_i q = 2 c_{i + 1} $
+\item $ c_0 = 0 $
+\end{enumerate}
+
+Despejando la ecuaci\'on 4, obtenemos
+
+\[
+d_i = \frac{1}{3 q} c_{i + 1} - c_i
+\]
+
+Y sustituyendo este $d$ y el $a$ de la ecuaci\'on 1 en la ecuaci\'on 2 obtenemos
+que
+
+\[
+\begin{split}
+b_i & = \frac{1}{q} (y_{i + 1} - y_i - c_i q^2 - d_i q^3) \\
+& = \frac{1}{q} (y_{i + 1} - y_i - c_i q^2 - \frac{1}{q} (c_{i + 1} - c_i) q^3 \\
+& = \frac{1}{q} (y_{i + 1} - y_i) - c_i q \frac{1}{3} (c_{i + 1} - c_i) q \\
+& = \frac{1}{q} * (y_{i + 1} - y_i) - \frac{q}{3} (2 c_i + c_{i + 1})
+\end{split}
+\]
+
+Substituyendo el valor de $b_i$ en la ecuaci\'on 3,
+
+\[
+\begin{split}
+0 & = b_i - b_{i + 1} + 2 c_i q + 3 d_i q^2 \\
+& = \frac{1}{q} (y_{i + 1} - y_i) - \frac{q}{3} (2 c_i + c_{i + 1}) - \frac{1}{q} (y_{i + 2) - y_{i + 1}} + \frac{q}{3} (2 c_{i + 1} + c{i + 2}) + 2 c_i q + q (c_{i + 1} - c_i)
+& = \left[ \frac{1}{q} (y_{i + 1} - y_i) - \frac{1}{q} (y_{i + 2} - y_{i + 1}) \right] + \frac{2}{3} q c_i - \frac{1}{3} q c_{i + 1} + \frac{2}{3} q c_{i + 1} + \frac{1}{3} q c_{i + 2} + 2 q c_i + q c_{i + 1} - q c_i
+& \frac{1}{q} \left[ y_{i + 2} - 2 y_{i + 1} + y_i \right] + \frac{1}{3} q c_i + \frac{4}{3} c_{i + 1} + \frac{1}{3} q c_{i + 2}
+\end{split}
+\]
+
+Equivalentemente,
+
+\[
+q c_i + 4 q c_{i + 1} + q c_{i + 2} = \frac{3}{q} \left[ y_{i + 2} - 2 y_{i + 1} + y_i \right]
+\]
+
+Esto es un sistema de $n - 1$ ecuaciones con $n + 1$ incognitas ($c_0 \cdots
+c_n$). Tomando $c_0 = 0$ y $c_n = 0$ tenemos un sistema de $n + 1$ ecuaciones
+que se puede expresar matricialmente de la forma
+
+\[
+Q * c = v
+\]
+
+Con
+
+\[
+Q \in \mathbb{R}^{(n + 1) \times (x + 1)}
+\]
+\[
+Q = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+q & 4 q & 4 q & 0 \\
+0 & q & 4 q & q \\
+&&&& \xddots \\
+&&&&& q & 4 q & q \\
+&&&&& 0 & 0 & 1
+\end{bmatrix}
+\]
+
+\[
+c \in \mathbb{R}^{n + 1}
+\]
+\[
+c = \begin{bmatrix}
+c_0 \\
+c_1 \\
+c_2 \\
+\vdots \\
+c_{n - 1} \\
+c_n
+\end{bmatrix}
+\]
+
+\[
+f \in \mathbb{R}^{n + 1}
+\]
+
+\[
+f = \frac{3}{q} \cdot \begin{bmatrix}
+0 \\
+y_0 - 2 y_1 + y_2 \\
+y_1 - 2 y_2 + y_3 \\
+\vdots
+y_{n - 2} - 2 y{n - 1} + y_n \\
+0
+\end{bmatrix}
+\]
+
+$A$ es una matriz banda de ancho 1, ya que todos sus valores fuera de la
+diagonal principal y las dos diagonales son iguales a $0$, y como es
+estrictamente diagonal dominante es inversible; entonces hay una soluci\'on
+\'unica al sistema.
+
+M\'as a\'un, como $A$ es tridiagonal se puede guardar en una matriz esparsa que
+contenga solo las diagonales y su complejidad espacial sea $\mathbb(O)(n)$ de
+espacio. Tambi\'en, el sistema puede ser resuelto haciendo eliminaci\'on
+Gaussiana sobre la matriz en complejidad temporal $\mathbb(O)(n)$.
+
+Finalmente, haciendo resuelto este sistema de ecuaciones y consiguiendo los
+$c_i$ de cada polinomio dentro del spline, podemos volver a las ecuaciones
+anteriores y definir los otros parametros como
+
+\[
+\begin{split}
+a_i & = y_i \\
+b_i & = \frac{1}{q} (y_{i + 1} - y_i) - \frac{q}{3} (2 c_i + c_{i + 1})
+d_i = \frac{1}{3 q} (c_{i + 1} - c_i)
+\end{split}
+\]
+
+Para ayudar al an\'alisis, usamos un parametro extra para este m\'etodo,
+$reset$ \'o $r$, que indica que los splines se definen entre $r$ puntos. Eso es,
+$S_0 \ldots S_{r - 1}$ forman un spline, $S_r \ldots S_{2r - 1}$ forman otro,
+etc. Por simplicidad, en el caso que el \'ultimo spline contenta menos de $r$
+puntos lo unimos con el anterior.
