@@ -40,6 +40,9 @@ if len(sys.argv) >= 5:
     outputFile = sys.argv[2]
     jump = int(sys.argv[3])
     method = int(sys.argv[4])
+
+    if len(sys.argv) >= 6:
+        reset = int(sys.argv[5])
 else:
 	print 'Parametros incorrectos'
 	sys.exit()
@@ -89,7 +92,7 @@ prom_elapsed_time = 0
 
 for t in xrange(1, times):
 	start_time = time.time()
-	process = subprocess.Popen('./tp '+outputFile+' out.txt '+str(method)+' '+str(jump-1), shell=True)
+	process = subprocess.Popen('./tp '+outputFile+' out.txt '+str(method)+' '+str(jump-1) + ' ' + str(reset), shell=True)
 	process.wait()
 	prom_elapsed_time = prom_elapsed_time + (time.time() - start_time)
 
