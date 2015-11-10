@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
 	Pelicula r;
 	
 	auto duration = 0;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		high_resolution_clock::time_point t1 = high_resolution_clock::now();
 		r = q->alentar(dc);
@@ -126,8 +126,9 @@ int main(int argc, char *argv[])
 		duration += std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
 	}
 	
-	cout << endl << argv[4] << ", " << duration / 10;
-	
+	if (argc == 6)
+		cout << argv[5] << ",";
+	cout << argv[4] << "," << duration / 3 << endl;
 
 	escribirSalida(out, r, q->f);
 	return 0;

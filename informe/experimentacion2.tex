@@ -40,6 +40,7 @@ Para ver como se comportaban los algoritmos mediante en salto, medimos el
 \centering
 \includegraphics[width=.95\textwidth]{graficos/ecm.png}
 \end{figure}
+\footnotesize{Este gr\'afico puede ser dificil de interpretar en blanco y negro}
 
 Este gr\'afico cementa la hipotesis de que \textit{camerachanges.avi}, que tiene
 muchos cambios de c\'amara lo que hace que sea dificil predecir el valor de dos
@@ -71,4 +72,45 @@ diferente.
 \centering
 \includegraphics[width=.95\textwidth]{graficos/psnr.png}
 \end{figure}
+\footnotesize{Este gr\'afico puede ser dificil de interpretar en blanco y negro}
 
+\subsection{An\'alisis de la velocidad de los algoritmos}
+
+\subsubsection{Comparaci\'on entre m\'etodos}
+
+Todos los m\'etodos que usamos en la c\'amara lenta se aplican individualmente a
+cada pixel, por lo tanto la complejidad temporal de los m\'etodos debe ser de la
+forma $ \mathbb{O}(h \cdot w \cdot f^{(m)}(c_1)) $, con $h$ y $w$ alto y ancho del
+video, respectivamente, $c_1$ la cantidad de frames del video final, y $f^{(m)}$
+alguna funci\'on que depende del m\'etodo.
+
+Como adem\'as ninguno de los tiempos de corrida de los m\'etodos cambia
+dependiendo del valor de los pixeles \footnote{descontando el tiempo del
+condicional cuando se pasa del rango de pixeles, que deber\'ia ser negligible},
+una buena manera de medir la eficiencia de los m\'etodos es aplicandolos al
+mismo video con diferente salto $s$ (ya que, para un $c_0$ fijo, tiene una
+correlaci\'on lineal con $c_1$). Para este caso decidimos usar
+\textit{baby.avi}.
+
+Por cada m\'etodo, medimos la eficiencia de ese m\'etodo tomando el tiempo que
+tarda en aplicar la c\'amara lenta a \textit{baby.avi} con diferentes 
+
+(Gr\'afico 4)
+
+El gr\'afico da resultados previsibles: el tiempo de corrida del m\'etodo de los
+splines es mayor que el de la interpolaci\'on lineal, que es mayor al de los
+vecinos m\'as cercanos. Esto se debe a que, como explicado en el desarrollo,
+el m\'etodo de los vecinos m\'as cercanos simplemente compia un valor de un
+frame a otro y el de interpolaci\'on lineal hace una cuenta simple en punto
+flotante, mientras que el de splines resuelve un sistema de $c_1$ ecuaciones.
+
+Otra conclusi\'on que se puede sacar de este gr\'afico es que los tres m\'etodos
+tiene complejidad temporal lineal. La raz\'on de esto es trivial en el caso de los
+vecinos m\'as cercanos y el de la interpolaci\'on lineal, mientras que en el
+caso de los splines nos aprovechamos que la matriz del sistema a resolver es
+banda, lo que nos permite resolverlo en complejidad $\mathbb{O}(c_1)$ en vez de
+la usual $\mathbb{O}(c_1^3)$.
+
+\subsubsection{Reset en el m\'etodo de los splines}
+
+Otro
