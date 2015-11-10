@@ -3,11 +3,15 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "camaralenta.h"
 #include "vecinomascercano.h"
 #include "interpolacionlineal.h"
 #include "splines.h"
+
+using namespace std::chrono;
+using namespace std;
 
 enum class Metodo
 {
@@ -109,7 +113,21 @@ int main(int argc, char *argv[])
 		usage(argv[0]);
 
 	CamaraLenta *q = parsearEntrada(in, m, reset);
-	Pelicula r = q->alentar(dc);
+	
+	Pelicula r;
+	
+	auto duration = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		high_resolution_clock::time_point t1 = high_resolution_clock::now();
+		r = q->alentar(dc);
+		high_resolution_clock::time_point t2 = high_resolution_clock::now();
+		
+		duration += std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
+	}
+	
+	cout << endl << argv[4] << ", " << duration / 10;
+	
 
 	escribirSalida(out, r, q->f);
 	return 0;
