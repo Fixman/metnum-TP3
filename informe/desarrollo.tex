@@ -13,12 +13,13 @@ para aproximar los frames restantes entre el video original y el video alentado.
 
 Cada uno de los m\'etodos que usamos opera con un solo pixel y el cambio de su
 valor a trav\'es del tiempo, as\'i que no es necesario que conozca todo un frame
-entero. Por esto, definimos cada m\'etodo como una funci\'on que toma dos
-par\'ametro:
+entero. Por esto, tomando el dominio $\mathlarger{\Pi} = \mathbb{N} \cap \left[ 0, 255
+\right]$ como el valor de los pixeles en la im\'agen, definimos cada m\'etodo
+como una funci\'on que toma dos par\'ametros:
 
 \[
 \begin{split}
-P \in \mathbb{P}^{c_0} & : \text{un vector de pixeles (valores en $[0, 255]$)} \\
+P \in \mathlarger{\Pi^{c_0}} & : \text{un vector de pixeles} \\
 c1 \in \mathbb{N} & : \text{la cantidad de frames en la pel\'icula resultante}
 \end{split}
 \]
@@ -26,7 +27,7 @@ c1 \in \mathbb{N} & : \text{la cantidad de frames en la pel\'icula resultante}
 Y a la vez devuelve un par\'ametro del tipo
 
 \[
-A \in \mathbb{P}^{c_1} : \text{el pixel $P$ en la pel\'icula final}
+A \in \mathlarger{\Pi^{c_1}} : \text{el pixel $P$ en la pel\'icula final}
 \]
 
 El enunciado tambi\'en especifica el par\'emtro $f$, el framerate del video,
@@ -46,10 +47,13 @@ la imagen original. Para lograr esto, podemos definirlo como la siguiente
 sucesi\'on:
 
 \[
-A_i = P_{\left[i / \frac{c_1 - 1}{c_0 - 1}\right]}
+\begin{split}
+q & = (c1 - 1) / (c0 - 1) \\
+A_i & = P_{\left[i / q \right]}
+\end{split}
 \]
 
-Donde $\left[x\right]$ representa el redondeo de $x$ al entero m\'as cercano.
+Donde $\left[x\right]$ representa el n\'umero entero m\'as cercano a $x$.
 
 \subsection{Interpolaci\'on Lineal}
 
@@ -80,13 +84,13 @@ q = (c1 - 1) / (c0 - 1)
 \]
 
 \[
-\forall{i < c_1}
 \begin{split}
-& x_0_i = \floorl \frac{i}{q} \floorr \\
-& y_0_i = P_{x_0_i} \\
-& x_1_i = \ceill \frac{i}{q} \ceill \\
-& y_1_i = P_{x_1_i} \\
-& A_i = y_0_i + (y_0_i - y_1_i) * \frac{i - x_0_i}{x_1_i - x_0_i}
+(\forall i & < c_1) \\
+{x_0}^{(i)} & = \lfloor \frac{i}{q} \rfloor \\
+{y_0}^{(i)} & = P_{{x_0}^{(i)}} \\
+{x_1}^{(i)} & = \lceil \frac{i}{q} \rceil \\
+{y_1}^{(i)} & = P_{{x_1}^{(i)}} \\
+A_i & = {y_0}^{(i)} + ({y_0}^{(i)} - {y_1}^{(i)}) * \frac{i - {x_0}^{(i)}}{{x_1}^{(i)} - {x_0}^{(i)}}
 \end{split}
 \]
 
@@ -106,17 +110,17 @@ S(x) & =
 \begin{cases}
 	S_0(x) & \text{si } x \in [x_0, x_1] \\
 	\vdots \\
-	S_{c_1 - 1} \text{si } x \in [x_{n - 1}, x_n]
+	S_{c_1 - 1} & \text{si } x \in [x_{n - 1}, x_n]
 \end{cases} \\
 S_i(x) & = a_i + b_i(x - x_i) + c_i(x - x_i)^2 + d_i(x - x_i)^3 \\
-S_i(x_i + 1) & = S_{x + 1}(x_i + 1) \forall i \in [0, n - 2] \\
-S'_i(x_i + 1) & = S'_{x + 1}(x_i + 1) \forall i \in [0, n - 2] \\
-S''_i(x_i + 1) & = S''_{x + 1}(x_i + 1) \forall i \in [0, n - 2] \\
+S_i(x_i + 1) & = S_{x + 1}(x_i + 1) \; \forall i \in [0, n - 2] \\
+S'_i(x_i + 1) & = S'_{x + 1}(x_i + 1) \; \forall i \in [0, n - 2] \\
+S''_i(x_i + 1) & = S''_{x + 1}(x_i + 1) \; \forall i \in [0, n - 2] \\
 S''(x_0) & = S''(x_n) = 0
 \end{split}
 \]
 
-Como en cada $x_i$ $S(x_i) = S_i(x_i)$ y $S_i(x_i) = a_i$, podemos ver que
+Como en cada $x_i$ $S(x_i) = S_i(x_i)$, y $S_i(x_i) = a_i$, podemos ver que
 
 \[
 a_i = y_i
@@ -132,7 +136,7 @@ Derivando cualquier polinomio c\'ubico $S_i$ obtenemos que
 
 \[
 \begin{split}
-S_i'(x) & = b_i + 2 c_i (x - x_i) + 3 d_i (x_(i + 1) - x_i)^2 \\
+S_i'(x) & = b_i + 2 c_i (x - x_i) + 3 d_i (x - x_i)^2 \\
 S_i''(x) & = 2 c_i + 6 d_i (x - x_i)
 \end{split}
 \]
@@ -143,7 +147,6 @@ consecutivos deben ser iguales,
 \[
 b_i + 2 c_i (x_{i + 1} - x_i) + 3 d_i (x_{i + 1} - x_i)^2 = b_{i + 1}
 \]
-
 \[
 2 c_i + 6 d_i (x_{i + 1} - x_i) = 2 c_{i + 1}
 \]
@@ -154,7 +157,6 @@ punto debe ser $0$,
 \[
 2 c_0 = 0
 \]
-
 \[
 2 c_{n - 1} + 6 d_{n - 1} (x_n - x_{n - 1}) = 0
 \]
@@ -193,9 +195,9 @@ Substituyendo el valor de $b_i$ en la ecuaci\'on 3,
 \[
 \begin{split}
 0 & = b_i - b_{i + 1} + 2 c_i q + 3 d_i q^2 \\
-& = \frac{1}{q} (y_{i + 1} - y_i) - \frac{q}{3} (2 c_i + c_{i + 1}) - \frac{1}{q} (y_{i + 2) - y_{i + 1}} + \frac{q}{3} (2 c_{i + 1} + c{i + 2}) + 2 c_i q + q (c_{i + 1} - c_i)
-& = \left[ \frac{1}{q} (y_{i + 1} - y_i) - \frac{1}{q} (y_{i + 2} - y_{i + 1}) \right] + \frac{2}{3} q c_i - \frac{1}{3} q c_{i + 1} + \frac{2}{3} q c_{i + 1} + \frac{1}{3} q c_{i + 2} + 2 q c_i + q c_{i + 1} - q c_i
-& \frac{1}{q} \left[ y_{i + 2} - 2 y_{i + 1} + y_i \right] + \frac{1}{3} q c_i + \frac{4}{3} c_{i + 1} + \frac{1}{3} q c_{i + 2}
+& = \frac{1}{q} (y_{i + 1} - y_i) - \frac{q}{3} (2 c_i + c_{i + 1}) - \frac{1}{q} (y_{i + 2) - y_{i + 1}} + \frac{q}{3} (2 c_{i + 1} + c{i + 2}) + 2 c_i q + q (c_{i + 1} - c_i) \\
+& = \left[ \frac{1}{q} (y_{i + 1} - y_i) - \frac{1}{q} (y_{i + 2} - y_{i + 1}) \right] + \frac{2}{3} q c_i - \frac{1}{3} q c_{i + 1} + \frac{2}{3} q c_{i + 1} + \frac{1}{3} q c_{i + 2} + 2 q c_i + q c_{i + 1} - q c_i \\
+& = \frac{1}{q} \left[ y_{i + 2} - 2 y_{i + 1} + y_i \right] + \frac{1}{3} q c_i + \frac{4}{3} q c_{i + 1} + \frac{1}{3} q c_{i + 2}
 \end{split}
 \]
 
@@ -210,30 +212,15 @@ c_n$). Tomando $c_0 = 0$ y $c_n = 0$ tenemos un sistema de $n + 1$ ecuaciones
 que se puede expresar matricialmente de la forma
 
 \[
-Q * c = v
-\]
-
-Con
-
-\[
-Q \in \mathbb{R}^{(n + 1) \times (x + 1)}
-\]
-\[
-Q = \begin{bmatrix}
+\begin{bmatrix}
 1 & 0 & 0 & 0 \\
 q & 4 q & 4 q & 0 \\
 0 & q & 4 q & q \\
-&&&& \xddots \\
+&&&& \ddots \\
 &&&&& q & 4 q & q \\
 &&&&& 0 & 0 & 1
 \end{bmatrix}
-\]
-
-\[
-c \in \mathbb{R}^{n + 1}
-\]
-\[
-c = \begin{bmatrix}
+\begin{bmatrix}
 c_0 \\
 c_1 \\
 c_2 \\
@@ -241,19 +228,13 @@ c_2 \\
 c_{n - 1} \\
 c_n
 \end{bmatrix}
-\]
-
-\[
-f \in \mathbb{R}^{n + 1}
-\]
-
-\[
-f = \frac{3}{q} \cdot \begin{bmatrix}
+=
+\frac{3}{q} \cdot \begin{bmatrix}
 0 \\
 y_0 - 2 y_1 + y_2 \\
 y_1 - 2 y_2 + y_3 \\
-\vdots
-y_{n - 2} - 2 y{n - 1} + y_n \\
+\vdots \\
+y_{n - 2} - 2 y_{n - 1} + y_n \\
 0
 \end{bmatrix}
 \]
@@ -275,8 +256,8 @@ anteriores y definir los otros parametros como
 \[
 \begin{split}
 a_i & = y_i \\
-b_i & = \frac{1}{q} (y_{i + 1} - y_i) - \frac{q}{3} (2 c_i + c_{i + 1})
-d_i = \frac{1}{3 q} (c_{i + 1} - c_i)
+b_i & = \frac{1}{q} (y_{i + 1} - y_i) - \frac{1}{3} q (2 c_i + c_{i + 1}) \\
+d_i & = \frac{1}{3 q} (c_{i + 1} - c_i)
 \end{split}
 \]
 
