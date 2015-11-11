@@ -6,7 +6,7 @@ Luego de realizar las pruebas, analizamos a ojo los 3 videos (1 por m\'etodo) al
 
 \begin{enumerate}
 \item M\'etodo m\'as cercano: al alentar varias veces el video con este m\'etodo, el resultado es equivalente a un slide de im\'agenes que se pasa lentamente, esto es, muchos frames iguales por segundo. Este efecto era esperable dado que este m\'etodo genera un nuevo frame id\'entico al frame m\'as cercano, por lo cual ejecutarlo consecutivamente solo generar\'a copias de frames entre frames ya existentes. Es por eso que el video en este caso no presenta ninguna alteraci\'on en los frames que sea visible a ojo dado que los nuevos frames no son distintos a los ya existentes en el video original.
-\item M\'etodo interpolaci\'on lineal: en este m\'etodo pudimos detectar un efecto al que vamos a llamar ``ghosting'', y que lo vamos a definir como el frame generado por la superposici\'on del frame anterior y el siguiente del que presenta este efecto. Este efecto sucede debido a que al ocurrir cambios bruscos entre frames, interpolaci\'on lineal intentar\'a generar un frame intermedio entre ambos. El efecto se puede apreciar en la figura X.
+\item M\'etodo interpolaci\'on lineal: en este m\'etodo pudimos detectar un efecto al que vamos a llamar ``ghosting'', y que lo vamos a definir como el frame generado por la superposici\'on del frame anterior y el siguiente del que presenta este efecto. Este efecto sucede debido a que al ocurrir cambios bruscos entre frames, interpolaci\'on lineal intentar\'a generar un frame intermedio entre ambos. El efecto se puede apreciar en la figura 1.
 
 \begin{figure}[h!]
   \centering
@@ -26,7 +26,7 @@ Luego de realizar las pruebas, analizamos a ojo los 3 videos (1 por m\'etodo) al
   	\caption{Frame en negativo con superposici\'on con otro frame en splines.}
 \end{figure}
 
-\item M\'etodo splines: para el video generado por este momento, detectamos que se genera el mismo efecto de ghosting que en con interpolaci\'on lineal, dado que tambi\'en es un tipo de interpolaci\'on. Sin embargo, hemos detectado una alteraci\'on extra. Esta alteraci\'on produce un efecto interesante, por el cual luego de un efecto de ghosting en los frames de la transici\'on de un cambio de c\'amara, el frame anterior al cambio de c\'amara vuelve a aparecer en negativo en superposici\'on con los frames luego del cambio de c\'amara. Para apreciar este efecto, se pueden observar las figuras X y Y.
+\item M\'etodo splines: para el video generado por este momento, detectamos que se genera el mismo efecto de ghosting que en con interpolaci\'on lineal, dado que tambi\'en es un tipo de interpolaci\'on. Sin embargo, hemos detectado una alteraci\'on extra. Esta alteraci\'on produce un efecto interesante, por el cual luego de un efecto de ghosting en los frames de la transici\'on de un cambio de c\'amara, el frame anterior al cambio de c\'amara vuelve a aparecer en negativo en superposici\'on con los frames luego del cambio de c\'amara. Para apreciar este efecto, se pueden observar las figuras 2 y 3.
 
 \end{enumerate}
 
