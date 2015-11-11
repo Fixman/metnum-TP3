@@ -2,10 +2,10 @@
 
 Cada video est\'a compuesto por frames de $h$ pixeles de altura y $w$ pixeles de
 ancho, donde cada pixel es un valor entero del $0$ al $255$, inclusive. A la
-vez, se consideran $c0$ de estos frames en suceci\'on para formar el video.
+vez, se consideran $c_0$ de estos frames en suceci\'on para formar el video.
 
 Para alentar el video nosotros tomamos un factor $q > 1$ (equivalente al
-argumento $c + 1$), y generamos un video con $c1 = (c0 - 1) \cdot q + 1$ frames. A cada frame
+argumento $c + 1$), y generamos un video con $c_1 = (c_0 - 1) \cdot q + 1$ frames. A cada frame
 le aplicamos cierto \textit{m\'etodo}, dependiendo de nuestras restricciones,
 para aproximar los frames restantes entre el video original y el video alentado.
 
@@ -18,7 +18,7 @@ como una funci\'on que toma dos par\'ametros:
 \[
 \begin{split}
 P \in \mathlarger{\Pi^{c_0}} & : \text{un vector de pixeles} \\
-c1 \in \mathbb{N} & : \text{la cantidad de frames en la pel\'icula resultante}
+c_1 \in \mathbb{N} & : \text{la cantidad de frames en la pel\'icula resultante}
 \end{split}
 \]
 
@@ -46,7 +46,7 @@ sucesi\'on:
 
 \[
 \begin{split}
-q & = (c1 - 1) / (c0 - 1) \\
+q & = (c_1 - 1) / (c_0 - 1) \\
 A_i & = P_{\left[i / q \right]}
 \end{split}
 \]
@@ -78,7 +78,7 @@ Como debemos definir esta f\'ormula las interpolaciones entre varios puntos en
 el plano discreto, definimos el m\'etodo como la sucesi\'on
 
 \[
-q = (c1 - 1) / (c0 - 1)
+q = (c_1 - 1) / (c_0 - 1)
 \]
 
 \[
@@ -269,7 +269,7 @@ De esta manera, y como ya tenemos definidos todos los $S_i$, podemos definir $A$
 
 \[
 \begin{split}
-d & = \left\lfloor \frac{i}{q} \right\rfloor \\
-A_i & = S_d(i - d \cdot q)
+j & = \left\lfloor \frac{i}{q} \right\rfloor \\
+A_i & = S_j(i - j \cdot q)
 \end{split}
 \]

@@ -21,15 +21,3 @@ Para la generaci\'on de cuadros extra construiremos, para cada posici\'on (i,j),
 \end{enumerate}
 
 Durante el desarrollo del trabajo, analizaremos las caracter\'isticas, ventajas y desventajas particulares de cada uno de los m\'etodos. 
-
-\subsection{Conceptos relevantes para el desarrollo}
-
-Para realizar un an\'alisis cuantitativo, llamaremos F al frame del video real (ideal) que deber\'iamos obtener con nuestro algoritmo, y $\overline{F}$ al frame del video efectivamente construido. Consideramos entonces dos medidas, directamente relacionadas entre ellas, como el \textbf{Error Cuadr\'atico Medio} (ECM) y \textbf{Peak to Signal Noise Ratio} (PSNR), denotados por ECM(F, $\overline{F}$) y PSNR(F, $\overline{F}$), respectivamente, y definidos como:
-
-$ECM(F, \overline{F}) = \frac{1}{mn} \sum\limits_{i=1}^m\sum\limits_{j=1}^n |F_{k_{ij}} - \overline{F}_{k_{ij}}|^2$ (1)
-
-y
-
-$PSNR(F, \overline{F}) = 10log_{10}(\frac{255^2}{ECM(F,\overline{F})})$
-
-Donde $m$ es la cantidad de filas de p\'ixeles en cada imagen y $n$ es la cantidad de columnas.
