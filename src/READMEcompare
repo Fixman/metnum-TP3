@@ -1,5 +1,0 @@
-El script compare.py toma un video .avi pasado en el parametro "inputFile", lo convierte a texto, y le quita frames segun el parametro "jump" que le pasemos (intercalados entre frame y frame), luego regenera esos frames con el algoritmo pasado en el parametro "method" y toma esos frames generados y los compara contra los que se quitaron del video original (el de inputFile). A partir de la comparacion calcula el ECM y el PSNR y los escupe por consola. Finalmente, devuelve el video generado con el nombre del parametro "outputFilename".avi.
-
-Para correrlo:
-
-python compare.py inputFile outputFilename jump method
