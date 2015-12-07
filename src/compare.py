@@ -12,28 +12,28 @@ import time
 DEVNULL = open(os.devnull, 'w+')
 
 def PSNR(ecm):
-	x = pow(255, 2) / ecm
-	psnr = 10 * math.log(x, 10)
-	return psnr
+    x = pow(255, 2) / ecm
+    psnr = 10 * math.log(x, 10)
+    return psnr
 
 def ECM(frameIdeal, frameGenerado, height, width):
-	suma = 0;
-	for i in xrange(0, height-1):
-	    for j in xrange(0, width-1):
-		suma += pow((frameIdeal[i][j] - frameGenerado[i][j]), 2)
+    suma = 0;
+    for i in xrange(0, height-1):
+        for j in xrange(0, width-1):
+            suma += pow((frameIdeal[i][j] - frameGenerado[i][j]), 2)
 
-	return suma / (height * width)
+    return suma / (height * width)
 
 # Los frames ideales seran los que se quitaron del video
 # original con la funcion quitarFramesPares
 def getFramesIdeales(frames, jump):
-	idealFrames = []
-	n = 0;
-	for frame in frames:
-		if (n % jump) > 0:
-			idealFrames.append(frame)
-		n = n + 1
-	return idealFrames
+    idealFrames = []
+    n = 0;
+    for frame in frames:
+        if (n % jump) > 0:
+            idealFrames.append(frame)
+        n = n + 1
+    return idealFrames
 
 def parseArgs():
     metodos = ['vecinoMasCercano', 'interpolacionLineal', 'interpolacionPorSplines']
@@ -50,7 +50,9 @@ def parseArgs():
     try:
 	args.method = int(args.method)
     except ValueError:
-	args.method = metodos.index(args.method)
+	args.method = metodos.index(args.method) + 1
+
+    args.textOutput = args.outputFile.replace('.avi', '.txt', 1).replace('.mp4', '.txt', 1)
 
     return args
 
@@ -85,25 +87,21 @@ def main():
     idealFrames = parseTextFile(open('originalVideo.txt'), args.jump)
 
     print('Convirtiendo 1 de cada {} frames de {} a texto.'.format(args.jump, args.inputFile), file = sys.stderr)
-    subprocess.call(['python', 'tools/videoToTextfile.py', args.inputFile, args.outputFile, str(args.jump)], stdout = DEVNULL)
+    subprocess.call(['python', 'tools/videoToTextfile.py', args.inputFile, args.textOutput, str(args.jump)], stdout = DEVNULL)
 
     if not args.meatureTime:
-	runProgram(args.outputFile, 'out.txt', str(args.method), str(args.jump - 1), args.reset)
+	runProgram(args.textOutput, 'out.txt', str(args.method), str(args.jump - 1), args.reset)
     else:
 	elapsed_time = sum(runProgram(args.outputFile, 'out.txt', str(args.method), str(args.jump - 1), args.reset) for x in range(10))
 	print('Tiempo promedio de 10 corridas del algoritmo: {} segundos'.format(elapsed_time / 10))
 
     generatedFrames = parseTextFile(open('out.txt'), args.jump)
 
-    qFramesCompared = len(generatedFrames)
-    totalEcm = 0
-
     height = len(idealFrames[0])
     width = len(idealFrames[0][0])
-    for idealF, generatedF in zip(idealFrames, generatedFrames)[:-1]:
-	totalEcm = totalEcm + ECM(idealF, generatedF, height, width)
+    qFramesCompared = len(generatedFrames)
 
-    promECM = totalEcm / qFramesCompared
+    promECM = sum(ECM(idealF, generatedF, height, width) for idealF, generatedF in zip(idealFrames, generatedFrames)[:-1]) / qFramesCompared
     promPSNR = PSNR(promECM)
 
     print('ECM: {}'.format(promECM))
@@ -111,8 +109,6 @@ def main():
 
     print('Convirtiendo texto a {}'.format(args.outputFile))
     subprocess.call(['python', 'tools/textfileToVideo.py', 'out.txt', args.outputFile], stdout = DEVNULL)
-    os.remove("originalVideo.txt")
-    os.remove("out.txt")
 
 if __name__ == '__main__':
     main()
