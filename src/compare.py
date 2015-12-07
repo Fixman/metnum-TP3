@@ -1,13 +1,15 @@
 from __future__ import print_function
 from __future__ import division
 
-import sys
+import argparse
+import math
 import os
 import subprocess
-import math
+import sys
 import time
 
-import argparse
+# Parece que Python 2 no tiene subprocess.DEVNULL
+DEVNULL = open(os.devnull, 'w+')
 
 def PSNR(ecm):
 	x = pow(255, 2) / ecm
@@ -42,6 +44,7 @@ def parseArgs():
     parser.add_argument('--jump', type = int, required = True, help = 'Cada relentizar el video')
     parser.add_argument('--method', required = True, choices = metodos + map(str, range(1, 4)), help = 'Metodo a usar (como cadena o entero)')
     parser.add_argument('--reset', type = int, help = 'Cada cuanto se resetea la ventana en interpolacion por splines')
+    parser.add_argument('--meatureTime', action = 'store_true', help = 'Correr el algoritmo 10 veces y medir el tiempo promedio de corrida')
     args = parser.parse_args()
 
     try:
@@ -69,24 +72,26 @@ def parseTextFile(f, jump):
 
     return getFramesIdeales(frames, jump)
 
+def runProgram(inputFile, outputFile, method, jump, reset):
+    start_time = time.time()
+    subprocess.call(['./tp', inputFile, outputFile, method, jump] + ([str(reset)] if reset else []))
+    return time.time() - start_time
+
 def main():
     args = parseArgs()
 
-    subprocess.call(['python', 'tools/videoToTextfile.py', args.inputFile, 'originalVideo.txt', '1'])
+    print('Convirtiendo {} a texto.'.format(args.inputFile), file = sys.stderr)
+    subprocess.call(['python', 'tools/videoToTextfile.py', args.inputFile, 'originalVideo.txt', '1'], stdout = DEVNULL)
     idealFrames = parseTextFile(open('originalVideo.txt'), args.jump)
-    subprocess.call(['python', 'tools/videoToTextfile.py', args.inputFile, args.outputFile, str(args.jump)])
 
-    times = 10
-    prom_elapsed_time = 0
+    print('Convirtiendo 1 de cada {} frames de {} a texto.'.format(args.jump, args.inputFile), file = sys.stderr)
+    subprocess.call(['python', 'tools/videoToTextfile.py', args.inputFile, args.outputFile, str(args.jump)], stdout = DEVNULL)
 
-    for t in xrange(1, times):
-	    start_time = time.time()
-	    subprocess.call(['./tp', args.outputFile, 'out.txt', str(args.method), str(args.jump - 1)] + ([str(args.reset)] if args.reset else []))
-	    prom_elapsed_time = prom_elapsed_time + (time.time() - start_time)
-
-    prom_elapsed_time /= 10
-
-    print('Tiempo promedio de 10 corridas del algoritmo: {}'.format(prom_elapsed_time), file = sys.stderr)
+    if not args.meatureTime:
+	runProgram(args.outputFile, 'out.txt', str(args.method), str(args.jump - 1), args.reset)
+    else:
+	elapsed_time = sum(runProgram(args.outputFile, 'out.txt', str(args.method), str(args.jump - 1), args.reset) for x in range(10))
+	print('Tiempo promedio de 10 corridas del algoritmo: {} segundos'.format(elapsed_time / 10))
 
     generatedFrames = parseTextFile(open('out.txt'), args.jump)
 
@@ -96,7 +101,7 @@ def main():
     height = len(idealFrames[0])
     width = len(idealFrames[0][0])
     for idealF, generatedF in zip(idealFrames, generatedFrames)[:-1]:
-	    totalEcm = totalEcm + ECM(idealF, generatedF, height, width)
+	totalEcm = totalEcm + ECM(idealF, generatedF, height, width)
 
     promECM = totalEcm / qFramesCompared
     promPSNR = PSNR(promECM)
@@ -104,9 +109,8 @@ def main():
     print('ECM: {}'.format(promECM))
     print('PSNR: {}'.format(promPSNR))
 
-    subprocess.call(['python', 'tools/textfileToVideo.py', 'out.txt', args.outputFile + ".avi"])
-
-    os.remove(args.outputFile)
+    print('Convirtiendo texto a {}'.format(args.outputFile))
+    subprocess.call(['python', 'tools/textfileToVideo.py', 'out.txt', args.outputFile], stdout = DEVNULL)
     os.remove("originalVideo.txt")
     os.remove("out.txt")
 
