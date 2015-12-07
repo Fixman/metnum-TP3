@@ -1,12 +1,13 @@
+from __future__ import print_function
+from __future__ import division
+
 import sys
 import os
 import subprocess
 import math
 import time
 
-#########################
-# Funciones Auxiliares  #
-#########################
+import argparse
 
 def PSNR(ecm):
 	x = pow(255, 2) / ecm
@@ -16,8 +17,9 @@ def PSNR(ecm):
 def ECM(frameIdeal, frameGenerado, height, width):
 	suma = 0;
 	for i in xrange(0, height-1):
-		for j in xrange(0, width-1):
-			suma += pow((frameIdeal[i][j] - frameGenerado[i][j]), 2)
+	    for j in xrange(0, width-1):
+		suma += pow((frameIdeal[i][j] - frameGenerado[i][j]), 2)
+
 	return suma / (height * width)
 
 # Los frames ideales seran los que se quitaron del video
@@ -31,120 +33,82 @@ def getFramesIdeales(frames, jump):
 		n = n + 1
 	return idealFrames
 
-#########################
-# Parametros de entrada.#
-#########################
+def parseArgs():
+    metodos = ['vecinoMasCercano', 'interpolacionLineal', 'interpolacionPorSplines']
 
-if len(sys.argv) >= 5:
-    inputFile = sys.argv[1]
-    outputFile = sys.argv[2]
-    jump = int(sys.argv[3])
-    method = int(sys.argv[4])
+    parser = argparse.ArgumentParser(description = 'Relentizar un video')
+    parser.add_argument('inputFile', type = str, help = 'Video de input')
+    parser.add_argument('outputFile', type = str, help = 'Video de output')
+    parser.add_argument('--jump', type = int, required = True, help = 'Cada relentizar el video')
+    parser.add_argument('--method', required = True, choices = metodos + map(str, range(1, 4)), help = 'Metodo a usar (como cadena o entero)')
+    parser.add_argument('--reset', type = int, help = 'Cada cuanto se resetea la ventana en interpolacion por splines')
+    args = parser.parse_args()
 
-    if len(sys.argv) >= 6:
-        reset = int(sys.argv[5])
-else:
-	print 'Parametros incorrectos'
-	sys.exit()
+    try:
+	args.method = int(args.method)
+    except ValueError:
+	args.method = metodos.index(args.method)
 
-############################
-# Genera archivo temporal. #
-############################
+    return args
 
-sys.argv = ['tools/videoToTextfile.py', inputFile, 'originalVideo.txt', '1']
-execfile('tools/videoToTextfile.py')
+def parseTextFile(f, jump):
+    qFrames = int(next(f))
+    height, width = [int(x) for x in next(f).split(',')]
+    frameRate = float(next(f))
 
-f = open("originalVideo.txt","r")
-qFrames = int(f.readline())
-height,width = map(int, f.readline().split(","))
-frameRate = float(f.readline())
+    frames = []
 
-####################
-# Prepara frames.  #
-####################
+    n = 1
+    pixels = []
+    for line in f:
+	    pixels.append(map(int, line.split(",")))
+	    if (n % height) == 0:
+		    frames.append(pixels)
+		    pixels = []
+	    n += 1
 
-frames = []
+    return getFramesIdeales(frames, jump)
 
-n = 1
-pixels = []
-for line in f:
-	pixels.append(map(int, line.split(",")))
-	if (n % height) == 0:
-		frames.append(pixels)
-		pixels = []
-	n = n + 1
+def main():
+    args = parseArgs()
 
-idealFrames = getFramesIdeales(frames, jump)
+    subprocess.call(['python', 'tools/videoToTextfile.py', args.inputFile, 'originalVideo.txt', '1'])
+    idealFrames = parseTextFile(open('originalVideo.txt'), args.jump)
+    subprocess.call(['python', 'tools/videoToTextfile.py', args.inputFile, args.outputFile, str(args.jump)])
 
-####################################
-# Quita frames de video original.  #
-####################################
+    times = 10
+    prom_elapsed_time = 0
 
-sys.argv = ['tools/videoToTextfile.py', inputFile, outputFile, jump]
-execfile('tools/videoToTextfile.py')
+    for t in xrange(1, times):
+	    start_time = time.time()
+	    subprocess.call(['./tp', args.outputFile, 'out.txt', str(args.method), str(args.jump - 1)] + ([str(args.reset)] if args.reset else []))
+	    prom_elapsed_time = prom_elapsed_time + (time.time() - start_time)
 
-####################################
-# Regenera los frames con metodo.  #
-####################################
+    prom_elapsed_time /= 10
 
-times = 10
-prom_elapsed_time = 0
+    print('Tiempo promedio de 10 corridas del algoritmo: {}'.format(prom_elapsed_time), file = sys.stderr)
 
-for t in xrange(1, times):
-	start_time = time.time()
-	process = subprocess.Popen('./tp '+outputFile+' out.txt '+str(method)+' '+str(jump-1) + ' ' + str(reset), shell=True)
-	process.wait()
-	prom_elapsed_time = prom_elapsed_time + (time.time() - start_time)
+    generatedFrames = parseTextFile(open('out.txt'), args.jump)
 
-prom_elapsed_time = prom_elapsed_time / 10
+    qFramesCompared = len(generatedFrames)
+    totalEcm = 0
 
-print "\nTiempo promedio 10 corridas algoritmo: "+str(prom_elapsed_time)+"\n"
+    height = len(idealFrames[0])
+    width = len(idealFrames[0][0])
+    for idealF, generatedF in zip(idealFrames, generatedFrames)[:-1]:
+	    totalEcm = totalEcm + ECM(idealF, generatedF, height, width)
 
-f2 = open("out.txt","r")
-qFrames = int(f2.readline())
-height,width = map(int, f2.readline().split(","))
-frameRate = float(f2.readline())
+    promECM = totalEcm / qFramesCompared
+    promPSNR = PSNR(promECM)
 
-####################
-# Prepara frames.  #
-####################
+    print('ECM: {}'.format(promECM))
+    print('PSNR: {}'.format(promPSNR))
 
-frames2 = []
+    subprocess.call(['python', 'tools/textfileToVideo.py', 'out.txt', args.outputFile + ".avi"])
 
-m = 1
-pixels2 = []
-for line in f2:
-	pixels2.append(map(int, line.split(",")))
-	if (m % height) == 0:
-		frames2.append(pixels2)
-		pixels2 = []
-	m = m + 1
+    os.remove(args.outputFile)
+    os.remove("originalVideo.txt")
+    os.remove("out.txt")
 
-generatedFrames = getFramesIdeales(frames2, jump)
-
-qFramesCompared = len(generatedFrames)
-totalEcm = 0
-
-for k in xrange(0, qFramesCompared-1):
-	totalEcm = totalEcm + ECM(idealFrames[k], generatedFrames[k], height, width)
-
-promECM = totalEcm / qFramesCompared
-promPSNR = PSNR(promECM)
-
-print "\nECM: " + str(promECM) + "\n"
-print "PSNR: " + str(promPSNR) + "\n"
-
-####################################
-# Convierte a video el generado.   #
-####################################
-
-sys.argv = ['tools/textfileToVideo.py', 'out.txt', outputFile+".avi"]
-execfile('tools/textfileToVideo.py')
-
-################################
-# Remueve archivos generados.  #
-################################
-
-os.remove(outputFile)
-os.remove("originalVideo.txt")
-os.remove("out.txt")
+if __name__ == '__main__':
+    main()

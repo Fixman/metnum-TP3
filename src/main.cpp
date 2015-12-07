@@ -18,7 +18,17 @@ enum class Metodo
 
 void usage(char *name)
 {
-	std::cout << "Usage: " << name << " entrada salida metodo cuadros_a_agregar [reset]" << std::endl;
+	const std::vector <std::string> metodos = {
+		"Vecino mas cercano",
+		"Interpolacion lineal",
+		"Interpolacion por Splines",
+	};
+
+	std::cerr << "Usage: " << name << " entrada salida metodo cuadros_a_agregar [reset]" << std::endl;
+	std::cerr << "Metodos: " << std::endl;
+	for (int i = 0; i < metodos.size(); i++)
+		std::cerr << '\t' << i + 1 << ": " << metodos[i] << std::endl;
+
 	exit(1);
 }
 
