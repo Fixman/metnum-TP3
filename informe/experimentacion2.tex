@@ -144,3 +144,12 @@ hip\'otesis es falsa. Al parecer, el algoritmo lineal para resolver el sistema
 de ecuaciones con la matriz banda es lo suficientemente eficiente como para que
 las ganancias de trabajar con matrices m\'as chicas sean negiglibles cuando se
 les suma el costo de preparar y juntar las soluciones.
+
+Por otro lado, analizando el \textbf{ECM} de estas instancias, podemos ver que
+el resultado es peor que en una corrida del algoritmo de Splines sin usar reset,
+y cuanto m\'as seguido se haga el reset mayor va a ser el error.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.95\textwidth]{graficos/ecm_reset.png}
+\end{figure}
