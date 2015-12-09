@@ -1,8 +1,8 @@
 \subsection{Consideraciones Generales}
 
-Cada video est\'a compuesto por frames de $h$ pixeles de altura y $w$ pixeles de
+Cada video est\'a compuesto por frames de $h$ p\'ixeles de altura y $w$ p\'ixeles de
 ancho, donde cada pixel es un valor entero del $0$ al $255$, inclusive. A la
-vez, se consideran $c_0$ de estos frames en suceci\'on para formar el video.
+vez, se consideran $c_0$ de estos frames en sucesi\'on para formar el video.
 
 Para alentar el video nosotros tomamos un factor $q > 1$ (equivalente al
 argumento $c + 1$), y generamos un video con $c_1 = (c_0 - 1) \cdot q + 1$ frames. A cada frame
@@ -12,20 +12,20 @@ para aproximar los frames restantes entre el video original y el video alentado.
 Cada uno de los m\'etodos que usamos opera con un solo pixel y el cambio de su
 valor a trav\'es del tiempo, as\'i que no es necesario que conozca todo un frame
 entero. Por esto, tomando el dominio $\mathlarger{\Pi} = \mathbb{N} \cap \left[ 0, 255
-\right]$ como el valor de los pixeles en la im\'agen, definimos cada m\'etodo
+\right]$ como el valor de los pixeles en el frame o imagen, definimos cada m\'etodo
 como una funci\'on que toma dos par\'ametros:
 
 \[
 \begin{split}
-P \in \mathlarger{\Pi^{c_0}} & : \text{un vector de pixeles} \\
-c_1 \in \mathbb{N} & : \text{la cantidad de frames en la pel\'icula resultante}
+P \in \mathlarger{\Pi^{c_0}} & : \text{un frame (o vector de p\'ixeles)} \\
+c_1 \in \mathbb{N} & : \text{la cantidad de frames en la pel\'icula luego de ser procesada con un m\'etodo}
 \end{split}
 \]
 
 Y a la vez devuelve un par\'ametro del tipo
 
 \[
-A \in \mathlarger{\Pi^{c_1}} : \text{el pixel $P$ en la pel\'icula final}
+A \in \mathlarger{\Pi^{c_1}} : \text{el frame $P$ en la pel\'icula final}
 \]
 
 El enunciado tambi\'en especifica el par\'emtro $f$, el framerate del video,
@@ -34,20 +34,20 @@ ninguno de nuestros m\'etodos.
 
 Durante el resto de la resoluci\'on usamos t\'erminos como ``cercano'' y
 ``lejano''. Se debe entender que, como los m\'etodos trabajan sobre un solo
-pixel y como cambia en el tiempo, estos se refieren a t\'erminos t\'emporales y
+pixel y como cambia en el tiempo, estos se refieren a t\'erminos temporales y
 no espaciales.
 
 \subsection{Vecino M\'as Cercano}
 
-El m\'etodo del vecino m\'as cercano implica, por cada pixel en la imagen
+El m\'etodo del vecino m\'as cercano implica, por cada pixel en el frame
 resultante, darle el valor del pixel m\'as cercano \footnote{temporalmente} en
-la imagen original. Para lograr esto, podemos definirlo como la siguiente
+el frame original. Para lograr esto, podemos definirlo como la siguiente
 sucesi\'on:
 
 \[
 \begin{split}
 q & = (c_1 - 1) / (c_0 - 1) \\
-A_i & = P_{\left[i / q \right]}
+A_i & = P_{\left[i / q \right]} \hspace{.2\textwidth} 1 \leq i \leq h*w
 \end{split}
 \]
 
@@ -74,7 +74,7 @@ lineal entre esos dos puntos como
 f(x) = y_0 + (y_1 - y_0) \frac{x - x_0}{x_1 - x_0}
 \]
 
-Como debemos definir esta f\'ormula las interpolaciones entre varios puntos en
+Como debemos definir esta f\'ormula para las interpolaciones entre varios puntos en
 el plano discreto, definimos el m\'etodo como la sucesi\'on
 
 \[
