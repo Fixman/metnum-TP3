@@ -45,6 +45,7 @@ def parseArgs():
     parser.add_argument('--method', required = True, choices = metodos + map(str, range(1, 4)), help = 'Metodo a usar (como cadena o entero)')
     parser.add_argument('--reset', type = int, help = 'Cada cuanto se resetea la ventana en interpolacion por splines')
     parser.add_argument('--meatureTime', action = 'store_true', help = 'Correr el algoritmo 10 veces y medir el tiempo promedio de corrida')
+    parser.add_argument('--mode', choices = {'averages', 'frame'} , default = 'averages', help = 'Que se imprime de output.')
     args = parser.parse_args()
 
     try:
@@ -101,11 +102,20 @@ def main():
     width = len(idealFrames[0][0])
     qFramesCompared = len(generatedFrames)
 
-    promECM = sum(ECM(idealF, generatedF, height, width) for idealF, generatedF in zip(idealFrames, generatedFrames)[:-1]) / qFramesCompared
-    promPSNR = PSNR(promECM)
+    errores = (ECM(idealF, generatedF, height, width) for idealF, generatedF in zip(idealFrames, generatedFrames)[:-1])
 
-    print('ECM: {}'.format(promECM))
-    print('PSNR: {}'.format(promPSNR))
+    if args.mode == 'averages':
+        promECM = sum(errores) / qFramesCompared
+        promPSNR = PSNR(promECM)
+
+        print('ECM: {}'.format(promECM))
+        print('PSNR: {}'.format(promPSNR))
+    elif args.mode == 'frame':
+        print('frame,ECM')
+        for e, f in enumerate(errores):
+            print('{},{}'.format(e, f))
+    else:
+        raise AssertionError('Modo invalido.')
 
     print('Convirtiendo texto a {}'.format(args.outputFile))
     subprocess.call(['python', 'tools/textfileToVideo.py', 'out.txt', args.outputFile], stdout = DEVNULL)
