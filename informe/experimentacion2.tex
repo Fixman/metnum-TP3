@@ -84,16 +84,15 @@ diferente.
 
 \subsubsection{An\'alisis de los m\'etodos frame por frame}
 
-Como el calculo de \textbf{ECM}, que hasta ahora solo estamos promediando, se
-hace por separado en cada frame, podemos hacer un an\'alisis por separado del
-error medio en cada frame de algunos videos para poder encontrar cuanto cambiaba
-este valor dependiendo de como se muevan, y si hay alg\'un m\'etodo que sea
-preferible en alg\'un caso en particular.
+El calculo del \textbf{ECM} se hace por separado en cada frame. Hasta ahora
+estabamos tomando el valor promedio entre todos los frames para medir el nivel
+de error de cada video, sin embargo puede ser \'util mirar como cambie este
+valor frame a frame.
 
-Hicimos varias instancias de prueba similar a la del experimento anterior donde
-habiendo un salto de \(2\) frames por cada frame del video original, ya que nos
-parece una buena aproximaci\'on al caso real de alentizaci\'on de videos, y
-calculamos el \textbf{ECM} entre cada uno de los frames generados y el frame
+Para lograr esto, hicimos varias instancias de prueba similares a la del
+experimento anterior donde habiendo un salto de \(2\) frames por cada frame del
+video original, ya que creemos que este es un caso muy com\'un en el mundo real,
+y calculamos el \textbf{ECM} entre cada uno de los frames generados y el frame
 real.
 
 \begin{figure}[H]
@@ -101,19 +100,18 @@ real.
 \includegraphics[width=.95\textwidth]{graficos/ecm_frame_funnybaby.png}
 \end{figure}
 
-Como \textit{funnybaby.avi} no tiene saltos ni ning\'un tipo de anormalidad en
-todo el video, podemos ver que el \textbf{ECM} queda en el mismo orden de
-magnitud por todo el an\'alisis. Sin embargo, podemos ver como este valor
-aumenta considerablemente cuando el beb\'e del video hace una acci\'on que
-cambia la mayor parte de los frames del video, como sacar la lengua o mover la
-cabeza.
+Como \textit{funnybaby.avi} no tiene saltos bruscos en
+todo el video, podemos ver que el \textbf{ECM} tiene el mismo orden de
+magnitud por todo el an\'alisis. Sin embargo, se puede observar que este valor
+aumenta considerablemente cuando el beb\'e del video hace una acci\'on cercana a
+la c\'amara, como sacar la lengua o mover la cabeza.
 
 Al igual que en el an\'alisis del \textbf{ECM} promedio en el punto anterior,
 con esta cantidad de saltos el valor de procesar el video con interpolaci\'on
-lineal es similar a la de procesarlo con splines. Sin embargo, en este gr\'afico
-tambi\'en se puede ver que aunque la diferencia entre el m\'etodo del m\'as
-cercano con estos dos es similar cuando no hay muchos cambios, el error se
-dispara cuando hay grandes cambios en la c\'amara.
+lineal es similar a la de procesarlo con splines. Adem\'as, aunque la diferencia
+entre el m\'etodo del vecino m\'as cercano con estos dos es similar cuando no hay
+muchos cambios entre frames, el error se dispara cuando hay grandes cambios en
+la c\'amara.
 
 Algo m\'as contundente pasa en el an\'alisis de otro video,
 \textit{slowmovesscene.mp4}:
@@ -124,7 +122,7 @@ Algo m\'as contundente pasa en el an\'alisis de otro video,
 \end{figure}
 
 Este video tiene dos cambios de c\'amara importantes, y podemos ver que el
-promedio del \textbf{ECM} se ve realmente afectado por los dos picos producidos
+promedio del \textbf{ECM} est\'a dominado por los dos picos producidos
 por estos cambios.
 
 Como la distribuci\'on de los errores puede ser completamente diferente dentro y
@@ -136,21 +134,22 @@ fiera del pico, analizamos los dos casos por separado.
 \includegraphics[width=.49\textwidth]{graficos/ecm_frame_slowmovescene_80_85.png}
 \end{figure}
 
-Podemos ver que en el gr\'afico que no incluye los picos tiene una
+Se puede ver que en el gr\'afico que no incluye los picos tiene una
 distribuci\'on similar a la de \textit{funnybaby.avi}, donde el m\'etodo de los
 splines y el de interpolaci\'on lineal tienen resultados similares y el de
-vecinos m\'as cercanos es considerablemente peor.
+vecinos m\'as cercanos es considerablemente peor, aunque est\'a en el mismo
+orden de magnitud.
 
 Sin embargo, haciendo zoom al pico m\'as grande, que pasa cuando la c\'amara
 apunta al cielo, podemos varios patrones interesantes. Por ejemplo, el m\'etodo del
 vecino m\'as cercano es el mejor por un solo frame cuando el video pasa por dos
-frames seguidos en la misma imagen, ya que interpolaci\'on lineal y splines
-intentan ser inteligentes y buscar un frame intermedio, mientras que el del
-vecino m\'as cercano simplemente lo copia. Tambi\'en se puede ver que cuando se
-hace el cambio de c\'amara, donde ninguno de los algoritmos puede predecir bien
-cual va a ser el frame siguiente, el m\'etodo del vecino m\'as cercano es
-considerablemente peor que los otros dos, y el de interpolaci\'on lineal es un
-poco mejor al de splines.
+frames seguidos identicos, ya que interpolaci\'on lineal y splines
+intentan ser inteligentes y buscar un frame intermedio entre el anterior y el
+siguiente, mientras que el primero simplemente lo copia. Tambi\'en se puede ver
+que cuando se hace el cambio de c\'amara, donde ninguno de los algoritmos puede
+predecir bien cual va a ser el frame siguiente, el m\'etodo del vecino m\'as
+cercano es considerablemente peor que los otros dos, y el de interpolaci\'on
+lineal es un poco mejor al de splines.
 
 \subsection{An\'alisis de la velocidad de los algoritmos}
 
