@@ -78,17 +78,19 @@ Como debemos definir esta f\'ormula para las interpolaciones entre varios puntos
 el plano discreto, definimos el m\'etodo como la sucesi\'on
 
 \[
-q = (c_1 - 1) / (c_0 - 1)
+scale = (c_1 - 1) / (c_0 - 1)
 \]
 
 \[
 \begin{split}
 (\forall i & < c_1) \\
-{x_0}^{(i)} & = \left\lfloor \frac{i}{q} \right\rfloor \\
-{y_0}^{(i)} & = P_{{x_0}^{(i)}} \\
-{x_1}^{(i)} & = \left\lceil \frac{i}{q} \right\rceil \\
-{y_1}^{(i)} & = P_{{x_1}^{(i)}} \\
-A_i & = {y_0}^{(i)} + ({y_0}^{(i)} - {y_1}^{(i)}) \cdot \frac{i - {x_0}^{(i)}}{{x_1}^{(i)} - {x_0}^{(i)}}
+q & = \left\lfloor \frac{i}{scale} \right\rfloor \\ 
+z & = \left\lceil \frac{i}{scale} \right\rceil \\
+{x_0}^{(i)} & = q * scale \\
+{y_0}^{(i)} & = P_{{q}^{(i)}} \\
+{x_1}^{(i)} & = z * scale \\
+{y_1}^{(i)} & = P_{{z}^{(i)}} \\
+A_i & = {y_0}^{(i)} + ({y_0}^{(i)} - {y_1}^{(i)}) \cdot \frac{i - {x_0}^{(i)}}{{x_0}^{(i)} - {x_1}^{(i)}}
 \end{split}
 \]
 
@@ -259,10 +261,11 @@ d_i & = \frac{1}{3 q} (c_{i + 1} - c_i)
 \end{split}
 \]
 
-Para ayudar al an\'alisis, usamos un parametro extra para este m\'etodo,
-$reset$ \'o $r$, que indica que los splines se definen entre $r$ puntos. Eso es,
+Para ayudar al an\'alisis, usamos un parametro extra para este m\'etodo que es el 
+\textbf{tama\~no de bloque} y lo vamos a definir como
+$reset$ \'o $r$ (que indica que los splines se definen entre $r$ puntos). Eso es,
 $S_0 \ldots S_{r - 1}$ forman un spline, $S_r \ldots S_{2r - 1}$ forman otro,
-etc. Por simplicidad, en el caso que el \'ultimo spline contenta menos de $r$
+etc. Por simplicidad, en el caso que el \'ultimo spline contenga menos de $r$
 puntos lo unimos con el anterior.
 
 De esta manera, y como ya tenemos definidos todos los $S_i$, podemos definir $A$ como

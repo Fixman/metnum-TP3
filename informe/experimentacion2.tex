@@ -10,22 +10,22 @@ principio del palomar} que haya un m\'etodo perfecto para todos los videos).
 
 Luego, para medir el error entre el nuevo video en c\'amara lenta y el video
 original se usa uno de dos m\'etodos: el \textbf{Error Cuadr\'atico Medio} o ECM
-y el \textbf{Peak Signal to Nouse Ratio} o PSNR, que se definen como
+y el \textbf{Peak Signal to Nouse Ratio} o PSNR. Tomando $n$ igual a la altura 
+de la imagen y $m$ igual a su largo, \'estos se definen como
 
 \[
 ECM(F, \bar{F}) = \frac{1}{m n} \sum^m_{i = i} \sum^n_{j = 1} \left| F_{k_{i j}} - \bar{F}_{k_{i j}} \right|^2
 \]
 \[
-PSNR(F, \bar{F}) = 10 \; log_{10} \left( \frac{255^2}{ECM(F, \bar{F}} \right)
+PSNR(F, \bar{F}) = 10 \; log_{10} \left( \frac{255^2}{ECM(F, \bar{F})} \right)
 \]
 
-Con $n$ igual a la altura de la im\'agen y $m$ igual a su largo. Estos dos
-valores son importantes ya que, aunque los m\'etodos trabajen
+Estos dos valores son importantes ya que, aunque los m\'etodos trabajen
 ``individualmente'' en un solo pixel, y el resultado de estos ser\'ian lo mismo
-corriendose en mismo video que individualmente, ya que las pruebas son con videos
+corri\'endose en mismo video que individualmente, ya que las pruebas son con videos
 reales.
 
-Hicimos los an\'alisis sobre 3 de los videos que contenian propiedades
+Hicimos los an\'alisis sobre 3 de los videos que conten\'ian propiedades
 interesantes: \textit{camerachanges.mp4}, \textit{slowmovescene.mp4}, y
 \textit{funnybaby.avi}, y sobre los tres algoritmos. Como los videos son
 relativamente peque\~nos y, por ende, el m\'etodo de splines es r\'apido,
@@ -45,9 +45,9 @@ Para ver como se comportaban los algoritmos mediante en salto, medimos el
 \begin{tiny}Este gr\'afico puede ser dificil de interpretar en blanco y negro\end{tiny}
 \vspace{2em}
 
-Este gr\'afico cementa la hipotesis de que \textit{camerachanges.avi}, que tiene
-muchos cambios de c\'amara lo que hace que sea dificil predecir el valor de dos
-pixeles cuando se pone en le c\'amara lenta tiene obviamente el mayor error. Por
+Este gr\'afico refuerza la hip\'otesis de que \textit{camerachanges.avi}, que tiene
+muchos cambios de c\'amara, lo que hace que sea dificil predecir el valor de dos
+pixeles cuando se pone en c\'amara lenta, tiene obviamente el mayor error. Por
 otro lado, \textit{funnybaby.avi} y \textit{slowmoviescene.mp4} empiezan con un
 \textbf{ECM} similar ya que ninguno de los dos tiene cambios bruscos, pero
 cuando la cantidad de saltos aumenta el primer video empieza a tener un error
@@ -63,8 +63,10 @@ solamente los valores para \textit{funnybaby.avi}
 \includegraphics[width=.95\textwidth]{graficos/ecm_funnybaby.png}
 \end{figure}
 
-Como podemos ver, incre\'iblemente, en todos los videos el m\'etodo de \textbf{interpolaci\'on
-lineal} es el que genera menores errores, inclusive menos que el de splines.
+Como podemos ver, para nuestra sorpresa, en todos los videos el m\'etodo de \textbf{interpolaci\'on
+lineal} es el que genera menores errores, inclusive menos que el de splines. Esto contradice nuestras
+suposiciones de que splines, dada su complejidad extra para la generaci\'on de los frames, tendr\'ia 
+un error inferior al de interpolaci\'on lineal.
 
 El an\'alisis por \textbf{PSNR} da un resultado similar al de \textbf{ECM}, ya
 que los dos m\'etodos est\'an inversamente relacionados. Sin embargo, se nota
@@ -108,7 +110,7 @@ tarda en aplicar la c\'amara lenta a \textit{baby.avi} con diferentes
 El gr\'afico da resultados previsibles: el tiempo de corrida del m\'etodo de los
 splines es mayor que el de la interpolaci\'on lineal, que es mayor al de los
 vecinos m\'as cercanos. Esto se debe a que, como explicado en el desarrollo,
-el m\'etodo de los vecinos m\'as cercanos simplemente compia un valor de un
+el m\'etodo de los vecinos m\'as cercanos simplemente copia un valor de un
 frame a otro y el de interpolaci\'on lineal hace una cuenta simple en punto
 flotante, mientras que el de splines resuelve un sistema de $c_1$ ecuaciones.
 
@@ -142,7 +144,7 @@ cada pixel por separado y creamos un video de tama\~no $1 \times 1$, con $c_0 =
 Por los resultados de los tiempos de la corrida podemos ver que nuestra
 hip\'otesis es falsa. Al parecer, el algoritmo lineal para resolver el sistema
 de ecuaciones con la matriz banda es lo suficientemente eficiente como para que
-las ganancias de trabajar con matrices m\'as chicas sean negiglibles cuando se
+las ganancias de trabajar con matrices m\'as chicas sean despreciables cuando se
 les suma el costo de preparar y juntar las soluciones.
 
 Por otro lado, analizando el \textbf{ECM} de estas instancias, podemos ver que
