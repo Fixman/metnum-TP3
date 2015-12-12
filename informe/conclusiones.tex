@@ -8,11 +8,11 @@ Nos podemos guiar con los siguientes datos:
 	\item El m\'etodo de los vecinos m\'as cercanos, a pesar de ser el m\'as r\'apido de los m\'etodos, tiene un resultado con un error considerablemente mayor que los otros dos. Adem\'as, se pierde la fluidez y la ilusi\'on de movimiento continuo del video, as\'i que debe ser descartado entre los m\'etodos a usar.
 	\item Cuando se alenta el video por un factor peque\~no, hasta 3 o 4 veces el largo del video original, los m\'etodos de interpolaci\'on lineal e interpolaci\'on por splines tienen similar error cuadr\'atico medio. De cualquier manera el m\'etodo de interpolaci\'on lineal siempre tiene menor error, y esa diferencia pasa a ser mucho mayor cuando se hace todav\'ia m\'as lento.
 	\item El m\'etodo de los splines es mucho m\'as lento que los otros dos m\'etodos, y separar los frames en grupos peque\~nos y calcular un spline por cada grupo no ayuda mucho a la velocidad, a pesar de hacer que el error sea todav\'ia mayor.
-	\item El m\'etodo de interpolaci\'on por splines genera m\'as de artifacts que el de intepolaci\'on lineal, particularmente cuando se consideran saltos de un valor alto.
-	\item Aunque el error medio es mayor, cuando se analiza a ojo se puede notar que el m\'etodo de los splines es bastante m\'as flu\'ido que el de interpolaci\'on lineal. Esto se debe a que el cerebro humano analiza las imagenes de una manera bastante diferente que una computadora, y es una ventaja ya lo ideal es que el resultado sea visto por personas.
+	\item El m\'etodo de interpolaci\'on por splines genera m\'as artifacts que el de intepolaci\'on lineal, particularmente cuando se consideran saltos de un valor alto.
+	\item Aunque el error medio es mayor, cuando se analiza a ojo se puede notar que el m\'etodo de los splines es bastante m\'as flu\'ido que el de interpolaci\'on lineal. Esto se debe a que el cerebro humano analiza las imagenes de una manera bastante diferente que una computadora, y es una ventaja ya que lo ideal es que el resultado sea visto por personas.
 \end{itemize}
 
-A pesar de que el \'ultimo punto aventaja ligeramente al m\'etodo de splines sobre el de interpolaci\'on lineal, nosotros llegamos a la conclusi\'on de que esta ventaja no supera a la mejoras sobre el tiempo de corrida y sobre error cuando el video se hace mucho m\'as lento que el original del segundo m\'etodo. Por lo tanto, en el caso general preferi\'iamos usar el m\'etodo de \textbf{interpolaci\'on lineal} para alentar un video.
+A pesar de que el \'ultimo punto aventaja ligeramente al m\'etodo de splines sobre el de interpolaci\'on lineal, nosotros llegamos a la conclusi\'on de que esta ventaja no supera a la mejoras sobre el tiempo de corrida y sobre error cuando el video se hace mucho m\'as lento que el original del segundo m\'etodo. Por lo tanto, en el caso general recomendar\'iamos usar el m\'etodo de \textbf{interpolaci\'on lineal} para alentar un video.
 
 \vspace{1em}
 
@@ -21,8 +21,10 @@ Adem\'as, haciendo este trabajo llegamos a varias otras conclusiones:
 \vspace{-2ex}
 
 \begin{itemize}
-	\item A pesar de que un m\'etodo sea m\'as compicado y parezca dar mejores resultados en casos patol\'ogicos que otro, como pasa en el caso del m\'etodo de los splines contra el de la intepolaci\'on lineal, puede ocurrir que en casos del ``mundo real'' este tenga un peor resultado.
+	\item A pesar de que un m\'etodo sea m\'as complicado y parezca dar mejores resultados en casos patol\'ogicos que otro, como pasa en el caso del m\'etodo de los splines contra el de la intepolaci\'on lineal, puede ocurrir que en casos del ``mundo real'' este tenga un peor resultado.
 	\item De la misma manera, m\'etodos mucho m\'as simples, como el del vecino m\'as cercano, pueden ser mejores individualmente en casos muy particulares como el de los pares de frames identicos.
 	\item A la hora de experimentar ciertos m\'etodos, vale la pena pensar como se diferencia cada uno y probar con casos extremos donde solo se aplica esta diferencia. Por ejemplo, al comparar diferentes ventanas para el m\'etodo de los splines pudimos hacerlo en un video de tama\~no \(1 \times 1\), ya que el resultado ser\'ia el mismo que en uno m\'as grande.
 	\item El calculo del promedio de los errores cuadr\'aticos medios de diferentes frames es bueno para comparar diferentes m\'etodos, pero es importante no usarlo como \'unica referencia, ya que este error puede ser totalmente dominado por algunos frames especiales y se puede perder informaci\'on \'util sobre otros.
 \end{itemize}
+
+Finalmente, descubrimos que m\'as alla del funcionamiento de cada m\'etodo y sus diferencias, ninguno de ellos es capaz de prevenir los cambios de c\'amara o de imagen bruscos, por lo cual es imposible evitar los picos de ECM vistos anteriormente y que provocan que la fidelidad del video generado pueda diferir en gran medida del original. Creemos que una forma de evitar esto y poder generar un video m\'as fiel al original es realizar un an\'alisis previo de los frames utilizados para generar el nuevo frame en cuesti\'on de manera de determinar si existe alg\'un cambio brusco entre ellos y poder tomar una decisi\'on para evitar que este cambio afecte considerablemente la fidelidad del frame generado (un ejemplo ser\'ia descartar los frames siguientes al cambio brusco para que no sean tenidos en cuenta).
