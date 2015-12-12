@@ -22,7 +22,7 @@ PSNR(F, \bar{F}) = 10 \; log_{10} \left( \frac{255^2}{ECM(F, \bar{F})} \right)
 
 Estos dos valores son importantes ya que, aunque los m\'etodos trabajen
 ``individualmente'' en un solo pixel, y el resultado de estos ser\'ian lo mismo
-corri\'endose en mismo video que individualmente, ya que las pruebas son con videos
+corri\'endose en un mismo video que individualmente, ya que las pruebas son con videos
 reales.
 
 Hicimos los an\'alisis sobre 3 de los videos que conten\'ian propiedades
@@ -88,11 +88,11 @@ diferente.
 
 El calculo del \textbf{ECM} se hace por separado en cada frame. Hasta ahora
 estabamos tomando el valor promedio entre todos los frames para medir el nivel
-de error de cada video, sin embargo puede ser \'util mirar como cambie este
+de error de cada video, sin embargo puede ser \'util mirar como cambia este
 valor frame a frame.
 
 Para lograr esto, hicimos varias instancias de prueba similares a la del
-experimento anterior donde habiendo un salto de \(2\) frames por cada frame del
+experimento anterior tomando un salto de \(2\) frames por cada frame del
 video original, ya que creemos que este es un caso muy com\'un en el mundo real,
 y calculamos el \textbf{ECM} entre cada uno de los frames generados y el frame
 real.
@@ -105,12 +105,12 @@ real.
 Como \textit{funnybaby.avi} no tiene saltos bruscos en
 todo el video, podemos ver que el \textbf{ECM} tiene el mismo orden de
 magnitud por todo el an\'alisis. Sin embargo, se puede observar que este valor
-aumenta considerablemente cuando el beb\'e del video hace una acci\'on cercana a
+aumenta considerablemente cuando el beb\'e del video realiza una acci\'on y se acerca a
 la c\'amara, como sacar la lengua o mover la cabeza.
 
 Al igual que en el an\'alisis del \textbf{ECM} promedio en el punto anterior,
 con esta cantidad de saltos el valor de procesar el video con interpolaci\'on
-lineal es similar a la de procesarlo con splines. Adem\'as, aunque la diferencia
+lineal es similar al de procesarlo con splines. Adem\'as, aunque la diferencia
 entre el m\'etodo del vecino m\'as cercano con estos dos es similar cuando no hay
 muchos cambios entre frames, el error se dispara cuando hay grandes cambios en
 la c\'amara.
@@ -143,9 +143,9 @@ vecinos m\'as cercanos es considerablemente peor, aunque est\'a en el mismo
 orden de magnitud.
 
 Sin embargo, haciendo zoom al pico m\'as grande, que pasa cuando la c\'amara
-apunta al cielo, podemos varios patrones interesantes. Por ejemplo, el m\'etodo del
+apunta al cielo, podemos observar varios patrones interesantes. Por ejemplo, el m\'etodo del
 vecino m\'as cercano es el mejor por un solo frame cuando el video pasa por dos
-frames seguidos identicos, ya que interpolaci\'on lineal y splines
+frames seguidos id\'enticos, ya que interpolaci\'on lineal y splines
 intentan ser inteligentes y buscar un frame intermedio entre el anterior y el
 siguiente, mientras que el primero simplemente lo copia. Tambi\'en se puede ver
 que cuando se hace el cambio de c\'amara, donde ninguno de los algoritmos puede
@@ -200,7 +200,7 @@ el desarrollo, es $r$, el ``reset'' del algoritmo. Esto indica que, en vez de
 crear un sistema de ecuaciones para todos los puntos temporales en cada pixel,
 va a crear sistemas de ecuaciones de tama\~no $r$ \footnote{posiblemente el
 \'ultimo sea un poco m\'as grande}, y resolver cada sistema por separado.
-Seg\'un nuestra hipotesis, esto deber\'ia resultar en un m\'etodo m\'as r\'apido
+Seg\'un nuestra hip\'otesis, esto deber\'ia resultar en un m\'etodo m\'as r\'apido
 pero menos efectivo.
 
 Para probarlo, dado que para probarlo eficientemente debemos hacerlo en videos
