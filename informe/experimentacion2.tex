@@ -31,7 +31,9 @@ interesantes: \textit{camerachanges.mp4}, \textit{slowmovescene.mp4}, y
 relativamente peque\~nos y, por ende, el m\'etodo de splines es r\'apido,
 dejamos el parametro $r$ del m\'etodo, que controla cada cuantos frames se
 vuelven a empezar los splines, igual a $\infty$, osea que se hace un solo spline
-para cada pixel del video.
+para cada pixel del video. Nuestra hip\'otesis, que probaremos en otra parte de
+la experimentaci\'on, es que tener un valor menor en este par\'ametro empeora el
+resultado del m\'etodo de splines.
 
 Para ver como se comportaban los algoritmos mediante en salto, medimos el
 \textbf{ECM} de cada frame en videos con saltos de 1, 3, 5, 7, y 10 frames, y
@@ -169,8 +171,8 @@ mismo video con diferente salto $s$ (ya que, para un $c_0$ fijo, tiene una
 correlaci\'on lineal con $c_1$). Para este caso decidimos usar
 \textit{baby.avi}.
 
-Por cada m\'etodo, medimos la eficiencia de ese m\'etodo tomando el tiempo que
-tarda en aplicar la c\'amara lenta a \textit{baby.avi} con diferentes 
+Por cada m\'etodo, medimos la eficiencia de este tomando el tiempo que
+tarda en aplicar la c\'amara lenta a \textit{baby.avi} con diferentes saltos.
 
 \begin{figure}[H]
 \centering
@@ -217,11 +219,12 @@ de ecuaciones con la matriz banda es lo suficientemente eficiente como para que
 las ganancias de trabajar con matrices m\'as chicas sean despreciables cuando se
 les suma el costo de preparar y juntar las soluciones.
 
-Por otro lado, analizando el \textbf{ECM} de estas instancias, podemos ver que
-el resultado es peor que en una corrida del algoritmo de Splines sin usar reset,
-y cuanto m\'as seguido se haga el reset mayor va a ser el error.
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=.95\textwidth]{graficos/ecm_reset.png}
 \end{figure}
+
+Por otro lado, analizando el \textbf{ECM} de estas instancias, podemos ver que
+el resultado es peor que en una corrida del algoritmo de Splines sin usar reset,
+y cuanto m\'as seguido se haga el reset mayor va a ser el error.
+
