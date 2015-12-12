@@ -8,6 +8,8 @@ import subprocess
 import sys
 import time
 
+# Correr ``python compare.py --help'' para mas informacion.
+
 # Parece que Python 2 no tiene subprocess.DEVNULL
 DEVNULL = open(os.devnull, 'w+')
 
@@ -38,14 +40,14 @@ def getFramesIdeales(frames, jump):
 def parseArgs():
     metodos = ['vecinoMasCercano', 'interpolacionLineal', 'interpolacionPorSplines']
 
-    parser = argparse.ArgumentParser(description = 'Relentizar un video')
-    parser.add_argument('inputFile', type = str, help = 'Video de input')
-    parser.add_argument('outputFile', type = str, help = 'Video de output')
-    parser.add_argument('--jump', type = int, required = True, help = 'Cada relentizar el video')
-    parser.add_argument('--method', required = True, choices = metodos + map(str, range(1, 4)), help = 'Metodo a usar (como cadena o entero)')
-    parser.add_argument('--reset', type = int, help = 'Cada cuanto se resetea la ventana en interpolacion por splines')
-    parser.add_argument('--meatureTime', action = 'store_true', help = 'Correr el algoritmo 10 veces y medir el tiempo promedio de corrida')
-    parser.add_argument('--mode', choices = {'averages', 'frame'} , default = 'averages', help = 'Que se imprime de output.')
+    parser = argparse.ArgumentParser(description = 'Calcula parametros cualitativos de un metodo en un video comparandolo con el resultado de sacar algunos frames y alentarlo.')
+    parser.add_argument('inputFile', type = str, help = 'Video de input.')
+    parser.add_argument('outputFile', type = str, help = 'Video de output.')
+    parser.add_argument('--jump', type = int, required = True, help = 'Cuanto alentizar el video.')
+    parser.add_argument('--method', required = True, choices = metodos + map(str, range(1, 4)), help = 'Metodo a usar (como cadena o entero).')
+    parser.add_argument('--reset', type = int, help = 'Cada cuanto se resetea la ventana en interpolacion por splines.')
+    parser.add_argument('--meatureTime', action = 'store_true', help = 'Correr el algoritmo 10 veces y medir el tiempo promedio de corrida.')
+    parser.add_argument('--mode', choices = {'averages', 'frame'} , default = 'averages', help = 'Imprimir ECM frame a frame, o ECM promedio.')
     args = parser.parse_args()
 
     try:
