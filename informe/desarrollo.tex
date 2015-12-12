@@ -15,18 +15,17 @@ entero. Por esto, tomando el dominio $\mathlarger{\Pi} = \mathbb{N} \cap \left[ 
 \right]$ como el valor de los pixeles en el frame o imagen, definimos cada m\'etodo
 como una funci\'on que toma dos par\'ametros:
 
-\[
-\begin{split}
-P \in \mathlarger{\Pi^{c_0}} & : \text{un frame (o vector de p\'ixeles)} \\
-c_1 \in \mathbb{N} & : \text{la cantidad de frames en la pel\'icula luego de ser procesada con un m\'etodo}
-\end{split}
-\]
-
-Y a la vez devuelve un par\'ametro del tipo
-
-\[
-A \in \mathlarger{\Pi^{c_1}} : \text{el frame $P$ en la pel\'icula final}
-\]
+\begin{gather}
+\begin{alignat*}{3}
+& \mathlarger{\Pi} = \mathbb{N} \cap \left[ 0, 255 \right] && : \text{conjunto de pixeles} \\
+& P \in \mathlarger{\Pi^{c_0}} && : \text{un frame (representado como un vector de pixeles)} \\
+& c_1 \in \mathbb{N} && : \text{la cantidad de frames en la pel\'icula luego de ser procesada con un m\'etodo} \\
+& && \\
+& && \hspace{-1.5in} \text{Y a la vez devuelve un par\'ametro del tipo} \\
+& && \\
+& A \in \mathlarger{\Pi^{c_1}} &&: \text{el frame $P$ en la pel\'icula final}
+\end{alignat*}
+\end{gather}
 
 El enunciado tambi\'en especifica el par\'emtro $f$, el framerate del video,
 pero adem\'as de hacerle una transformaci\'on simple al video final no influye a
@@ -47,7 +46,7 @@ sucesi\'on:
 \[
 \begin{split}
 q & = (c_1 - 1) / (c_0 - 1) \\
-A_i & = P_{\left[i / q \right]} \hspace{.2\textwidth} 1 \leq i \leq h*w
+A_i & = P_{\left[i / q \right]} \hspace{2em} \forall \hspace{1ex} 0 \leq i < h*w
 \end{split}
 \]
 
@@ -78,21 +77,23 @@ Como debemos definir esta f\'ormula para las interpolaciones entre varios puntos
 el plano discreto, definimos el m\'etodo como la sucesi\'on
 
 \[
-scale = (c_1 - 1) / (c_0 - 1)
-\]
-
-\[
 \begin{split}
-(\forall i & < c_1) \\
+scale & = (c_1 - 1) / (c_0 - 1) \\
+\\
+& (\forall i < c_1) \\
 q & = \left\lfloor \frac{i}{scale} \right\rfloor \\ 
 z & = \left\lceil \frac{i}{scale} \right\rceil \\
 {x_0}^{(i)} & = q * scale \\
 {y_0}^{(i)} & = P_{{q}^{(i)}} \\
 {x_1}^{(i)} & = z * scale \\
 {y_1}^{(i)} & = P_{{z}^{(i)}} \\
-A_i & = {y_0}^{(i)} + ({y_0}^{(i)} - {y_1}^{(i)}) \cdot \frac{i - {x_0}^{(i)}}{{x_0}^{(i)} - {x_1}^{(i)}}
+A_i & = {y_0}^{(i)} + ({y_0}^{(i)} - {y_1}^{(i)}) \cdot \frac{i - {x_0}^{(i)}}{{x_0}^{(i)} - {x_1}^{(i)}} \hspace{2em} \forall \hspace{1ex} 0 \leq i < h*w
 \end{split}
 \]
+
+En pocas palabras, esta ecuaci\'on genera una funci\'on lineal entre cada para
+de frames del video original, y aproxima los valores intermedios por el valor de
+esta en cada punto del nuevo video.
 
 \subsection{Interpolaci\'on por Splines}
 
@@ -268,11 +269,12 @@ $S_0 \ldots S_{r - 1}$ forman un spline, $S_r \ldots S_{2r - 1}$ forman otro,
 etc. Por simplicidad, en el caso que el \'ultimo spline contenga menos de $r$
 puntos lo unimos con el anterior.
 
-De esta manera, y como ya tenemos definidos todos los $S_i$, podemos definir $A$ como
+De esta manera, y como ya tenemos definidos todos los $S_i$, podemos definir
+$A_i$ como el valor del spline en el punto correspondiente al sub\'indice \(i\):
 
 \[
 \begin{split}
 j & = \left\lfloor \frac{i}{q} \right\rfloor \\
-A_i & = S_j(i - j \cdot q)
+A_i & = S_j(i - j \cdot q) \hspace{2em} \forall \hspace{1ex} 0 \leq i < h*w
 \end{split}
 \]
